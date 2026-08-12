@@ -1,0 +1,40 @@
+part of 'app_pages.dart';
+
+/// Contains all the route names for the application.
+abstract class AppRoutes {
+  // Startup
+  static const String splash = '/splash';
+
+  // Authentication
+  static const String login = '/login';
+  static const String register = '/register';
+  static const String forgotPassword = '/forgot-password';
+
+
+  // Dashboards
+  static const String superAdminDashboard = '/super-admin/dashboard';
+  static const String adminDashboard = '/admin/dashboard';
+  static const String employeeDashboard = '/employee/dashboard';
+
+  // Core Features
+  static const String departments = '/departments';
+  static const String projects = '/projects';
+  static const String tasks = '/tasks';
+  static const String reports = '/reports';
+  static const String notifications = '/notifications';
+  static const String profile = '/profile';
+
+  /// Returns the dashboard route based on the user's role.
+  static String dashboardForRole(String role) {
+    switch (role) {
+      case 'super_admin':
+        return superAdminDashboard;
+      case 'admin':
+        return adminDashboard;
+      case 'employee':
+        return employeeDashboard;
+      default:
+        return login;
+    }
+  }
+}
