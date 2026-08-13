@@ -88,7 +88,7 @@ class AppEmptyStateWidget extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.secondary,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: AppRadius.borderMd),
+                shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderMd),
               ),
               child: Text(actionText!),
             ),
@@ -140,7 +140,7 @@ class AppErrorStateWidget extends StatelessWidget {
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.secondary,
               side: const BorderSide(color: AppColors.secondary),
-              shape: RoundedRectangleBorder(borderRadius: AppRadius.borderMd),
+              shape: const RoundedRectangleBorder(borderRadius: AppRadius.borderMd),
             ),
           ),
         ],

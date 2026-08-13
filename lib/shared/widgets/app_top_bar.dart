@@ -52,8 +52,8 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
         border: Border(
           bottom: BorderSide(
             color: isDark
-                ? Colors.white.withOpacity(0.1)
-                : AppColors.outlineVariant.withOpacity(0.5),
+                ? Colors.white.withValues(alpha: 0.1)
+                : AppColors.outlineVariant.withValues(alpha: 0.5),
             width: 1,
           ),
         ),
@@ -146,7 +146,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                     : AppColors.surfaceContainerLow,
                 borderRadius: AppRadius.borderFull,
                 border: Border.all(
-                  color: AppColors.outlineVariant.withOpacity(0.4),
+                  color: AppColors.outlineVariant.withValues(alpha: 0.4),
                   width: 1,
                 ),
               ),

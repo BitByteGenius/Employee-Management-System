@@ -20,8 +20,11 @@ class ApiEndpoints {
 
   // Users
   static const String users = '/users';
+  static const String pendingUsers = '/users?status=pending';
   static String approveUser(String id) => '/users/$id/approve';
   static String rejectUser(String id) => '/users/$id/reject';
+  static String assignUserDepartment(String id) => '/users/$id/department';
+  static String assignUserRole(String id) => '/users/$id/assign-role';
   static String activateUser(String id) => '/users/$id/activate';
   static String deactivateUser(String id) => '/users/$id/deactivate';
   static String updateUserRole(String id) => '/users/$id/role';

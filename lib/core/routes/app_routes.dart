@@ -13,6 +13,7 @@ abstract class AppRoutes {
 
   // Dashboards
   static const String superAdminDashboard = '/super-admin/dashboard';
+  static const String accessControl = '/super-admin/access-control';
   static const String adminDashboard = '/admin/dashboard';
   static const String employeeDashboard = '/employee/dashboard';
 

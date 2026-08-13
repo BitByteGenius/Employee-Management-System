@@ -5,8 +5,8 @@ import 'package:tms/core/constants/app_sizes.dart';
 import 'package:tms/core/constants/app_typography.dart';
 import 'package:tms/core/routes/app_pages.dart';
 import 'package:tms/modules/super_admin/controllers/super_admin_dashboard_controller.dart';
+import 'package:tms/modules/super_admin/widgets/super_admin_sidebar.dart';
 import 'package:tms/shared/widgets/app_data_table.dart';
-import 'package:tms/shared/widgets/app_sidebar.dart';
 import 'package:tms/shared/widgets/app_stat_card.dart';
 import 'package:tms/shared/widgets/app_state_widgets.dart';
 import 'package:tms/shared/widgets/app_status_badge.dart';
@@ -21,59 +21,8 @@ class SuperAdminDashboardView extends GetView<SuperAdminDashboardController> {
     final isDesktop = AppBreakpoints.isDesktop(MediaQuery.sizeOf(context).width);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final navItems = [
-      const AppNavItem(
-        label: 'Dashboard',
-        icon: Icons.dashboard_outlined,
-        route: AppRoutes.superAdminDashboard,
-        isSelected: true,
-      ),
-      const AppNavItem(
-        label: 'Organization',
-        icon: Icons.corporate_fare_outlined,
-        route: AppRoutes.departments,
-      ),
-      const AppNavItem(
-        label: 'Access Control',
-        icon: Icons.admin_panel_settings_outlined,
-        route: AppRoutes.superAdminDashboard,
-      ),
-      const AppNavItem(
-        label: 'Work Management',
-        icon: Icons.work_outline,
-        route: AppRoutes.projects,
-      ),
-      const AppNavItem(
-        label: 'Communication',
-        icon: Icons.forum_outlined,
-        route: AppRoutes.notifications,
-      ),
-      const AppNavItem(
-        label: 'Analytics',
-        icon: Icons.analytics_outlined,
-        route: AppRoutes.reports,
-      ),
-      const AppNavItem(
-        label: 'System',
-        icon: Icons.settings_system_daydream_outlined,
-        route: AppRoutes.superAdminDashboard,
-      ),
-    ];
-
-    final sidebar = AppSidebar(
-      roleTitle: 'TeamOrbit',
-      roleSubtitle: 'Super Admin',
-      navItems: navItems,
+    const sidebar = SuperAdminSidebar(
       currentRoute: AppRoutes.superAdminDashboard,
-      primaryActionText: 'New User',
-      primaryActionIcon: Icons.add_circle_outline,
-      onPrimaryActionTap: () {
-        Get.snackbar(
-          'User Management',
-          'Create new admin or user modal',
-          snackPosition: SnackPosition.TOP,
-        );
-      },
     );
 
     return Scaffold(
@@ -259,8 +208,8 @@ class SuperAdminDashboardView extends GetView<SuperAdminDashboardController> {
         borderRadius: AppRadius.borderLg,
         border: Border.all(
           color: isDark
-              ? Colors.white.withOpacity(0.1)
-              : AppColors.outlineVariant.withOpacity(0.5),
+              ? Colors.white.withValues(alpha: 0.1)
+              : AppColors.outlineVariant.withValues(alpha: 0.5),
         ),
       ),
       child: Column(
@@ -283,7 +232,7 @@ class SuperAdminDashboardView extends GetView<SuperAdminDashboardController> {
                   child: CircularProgressIndicator(
                     value: 0.85,
                     strokeWidth: 16,
-                    backgroundColor: AppColors.warning.withOpacity(0.3),
+                    backgroundColor: AppColors.warning.withValues(alpha: 0.3),
                     valueColor: const AlwaysStoppedAnimation<Color>(AppColors.secondary),
                   ),
                 ),
@@ -330,8 +279,8 @@ class SuperAdminDashboardView extends GetView<SuperAdminDashboardController> {
         borderRadius: AppRadius.borderLg,
         border: Border.all(
           color: isDark
-              ? Colors.white.withOpacity(0.1)
-              : AppColors.outlineVariant.withOpacity(0.5),
+              ? Colors.white.withValues(alpha: 0.1)
+              : AppColors.outlineVariant.withValues(alpha: 0.5),
         ),
       ),
       child: Column(
@@ -431,8 +380,8 @@ class SuperAdminDashboardView extends GetView<SuperAdminDashboardController> {
         borderRadius: AppRadius.borderLg,
         border: Border.all(
           color: isDark
-              ? Colors.white.withOpacity(0.1)
-              : AppColors.outlineVariant.withOpacity(0.5),
+              ? Colors.white.withValues(alpha: 0.1)
+              : AppColors.outlineVariant.withValues(alpha: 0.5),
         ),
       ),
       child: Column(
@@ -452,7 +401,7 @@ class SuperAdminDashboardView extends GetView<SuperAdminDashboardController> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
-                    color: AppColors.error.withOpacity(0.1),
+                    color: AppColors.error.withValues(alpha: 0.1),
                     borderRadius: AppRadius.borderSm,
                   ),
                   child: Text(
@@ -558,8 +507,8 @@ class SuperAdminDashboardView extends GetView<SuperAdminDashboardController> {
         borderRadius: AppRadius.borderLg,
         border: Border.all(
           color: isDark
-              ? Colors.white.withOpacity(0.1)
-              : AppColors.outlineVariant.withOpacity(0.5),
+              ? Colors.white.withValues(alpha: 0.1)
+              : AppColors.outlineVariant.withValues(alpha: 0.5),
         ),
       ),
       child: Column(

@@ -48,30 +48,30 @@ class AppStatCard extends StatelessWidget {
             border: Border(
               top: BorderSide(
                 color: isDark
-                    ? Colors.white.withOpacity(0.1)
-                    : AppColors.outlineVariant.withOpacity(0.5),
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : AppColors.outlineVariant.withValues(alpha: 0.5),
               ),
               right: BorderSide(
                 color: isDark
-                    ? Colors.white.withOpacity(0.1)
-                    : AppColors.outlineVariant.withOpacity(0.5),
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : AppColors.outlineVariant.withValues(alpha: 0.5),
               ),
               bottom: BorderSide(
                 color: isDark
-                    ? Colors.white.withOpacity(0.1)
-                    : AppColors.outlineVariant.withOpacity(0.5),
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : AppColors.outlineVariant.withValues(alpha: 0.5),
               ),
               left: leftBorderColor != null
                   ? BorderSide(color: leftBorderColor!, width: 4)
                   : BorderSide(
                       color: isDark
-                          ? Colors.white.withOpacity(0.1)
-                          : AppColors.outlineVariant.withOpacity(0.5),
+                          ? Colors.white.withValues(alpha: 0.1)
+                          : AppColors.outlineVariant.withValues(alpha: 0.5),
                     ),
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.02),
+                color: Colors.black.withValues(alpha: 0.02),
                 blurRadius: 4,
                 offset: const Offset(0, 2),
               ),

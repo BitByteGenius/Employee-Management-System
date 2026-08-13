@@ -42,8 +42,8 @@ class AppDataTable extends StatelessWidget {
         borderRadius: AppRadius.borderLg,
         border: Border.all(
           color: isDark
-              ? Colors.white.withOpacity(0.1)
-              : AppColors.outlineVariant.withOpacity(0.5),
+              ? Colors.white.withValues(alpha: 0.1)
+              : AppColors.outlineVariant.withValues(alpha: 0.5),
         ),
       ),
       child: Column(
@@ -146,7 +146,7 @@ class AppDataTable extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: isDark
                             ? AppColors.darkSurfaceContainer
-                            : AppColors.surfaceContainerLow.withOpacity(0.5),
+                            : AppColors.surfaceContainerLow.withValues(alpha: 0.5),
                       ),
                       children: columns
                           .map(
@@ -175,8 +175,8 @@ class AppDataTable extends StatelessWidget {
                           border: Border(
                             bottom: BorderSide(
                               color: isDark
-                                  ? Colors.white.withOpacity(0.05)
-                                  : AppColors.outlineVariant.withOpacity(0.2),
+                                  ? Colors.white.withValues(alpha: 0.05)
+                                  : AppColors.outlineVariant.withValues(alpha: 0.2),
                             ),
                           ),
                         ),
