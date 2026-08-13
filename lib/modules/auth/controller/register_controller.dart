@@ -31,12 +31,11 @@ class RegisterController extends GetxController {
     isLoading.value = true;
     errorMessage.value = null;
     try {
-      final fullName = '${_firstName.trim()} ${_lastName.trim()}'.trim();
       await _apiClient.dio.post(
         ApiEndpoints.register,
         data: {
-          'name': fullName,
-          'fullName': fullName,
+          'firstName': _firstName.trim(),
+          'lastName': _lastName.trim(),
           'email': _email.trim(),
           'password': _password,
           'role': selectedRole.value,
@@ -55,6 +54,17 @@ class RegisterController extends GetxController {
       final dynamic dioError = error;
       final data = dioError.response?.data;
       if (data is Map && data['message'] != null) {
+        final errors = data['errors'];
+        if (errors is List && errors.isNotEmpty) {
+          return errors
+              .map((item) {
+                if (item is Map && item['msg'] != null) {
+                  return item['msg'].toString();
+                }
+                return item.toString();
+              })
+              .join('\n');
+        }
         return data['message'].toString();
       }
     } catch (_) {}
