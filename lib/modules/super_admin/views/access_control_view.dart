@@ -138,11 +138,9 @@ class AccessControlView
                       // ==================================================
                       // TABS
                       // ==================================================
-                      Obx(
-                        () => _Tabs(
-                          controller:
-                              controller,
-                        ),
+                      _Tabs(
+                        controller:
+                            controller,
                       ),
 
                       const SizedBox(
@@ -153,13 +151,11 @@ class AccessControlView
                       // ==================================================
                       // CONTENT
                       // ==================================================
-                      Obx(
-                        () => _ContentLayout(
-                          controller:
-                              controller,
-                          isDark:
-                              isDark,
-                        ),
+                      _ContentLayout(
+                        controller:
+                            controller,
+                        isDark:
+                            isDark,
                       ),
                     ],
                   ),
@@ -189,6 +185,16 @@ class _ContentLayout
 
   @override
   Widget build(
+    BuildContext context,
+  ) {
+    return Obx(
+      () => _buildContent(
+        context,
+      ),
+    );
+  }
+
+  Widget _buildContent(
     BuildContext context,
   ) {
     // ==============================================================
@@ -372,62 +378,66 @@ class _Tabs
   Widget build(
     BuildContext context,
   ) {
-    final selected =
-        controller
-            .selectedTab
-            .value;
+    return Obx(
+      () {
+        final selected =
+            controller
+                .selectedTab
+                .value;
 
-    final total =
-        controller
-            .totalPending
-            .value;
+        final total =
+            controller
+                .totalPending
+                .value;
 
-    return Container(
-      decoration:
-          const BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color:
-                AppColors
-                    .outlineVariant,
-          ),
-        ),
-      ),
-
-      child: Row(
-        children: [
-          _TabButton(
-            label:
-                'Pending Approvals',
-            count:
-                total,
-            selected:
-                selected == 0,
-            onTap: () {
-              controller
-                  .selectedTab
-                  .value = 0;
-            },
+        return Container(
+          decoration:
+              const BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color:
+                    AppColors
+                        .outlineVariant,
+              ),
+            ),
           ),
 
-          const SizedBox(
-            width:
-                AppSpacing.lg,
-          ),
+          child: Row(
+            children: [
+              _TabButton(
+                label:
+                    'Pending Approvals',
+                count:
+                    total,
+                selected:
+                    selected == 0,
+                onTap: () {
+                  controller
+                      .selectedTab
+                      .value = 0;
+                },
+              ),
 
-          _TabButton(
-            label:
-                'Delete',
-            selected:
-                selected == 1,
-            onTap: () {
-              controller
-                  .selectedTab
-                  .value = 1;
-            },
+              const SizedBox(
+                width:
+                    AppSpacing.lg,
+              ),
+
+              _TabButton(
+                label:
+                    'Delete',
+                selected:
+                    selected == 1,
+                onTap: () {
+                  controller
+                      .selectedTab
+                      .value = 1;
+                },
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
