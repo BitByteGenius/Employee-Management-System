@@ -32,7 +32,7 @@ class TmsApp extends StatelessWidget {
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: themeController.themeMode.value,
-            initialRoute: AppRoutes.splash,
+            initialRoute: AppRoutes.superAdminDashboard,//splash,
             getPages: AppPages.pages,
           );
         },

@@ -1,133 +1,184 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import 'package:tms/core/constants/app_colors.dart';
 import 'package:tms/core/constants/app_sizes.dart';
 import 'package:tms/core/constants/app_typography.dart';
-import 'package:tms/core/routes/app_pages.dart';
 import 'package:tms/modules/super_admin/controllers/access_control_controller.dart';
 import 'package:tms/modules/super_admin/widgets/access_control_cards.dart';
 import 'package:tms/modules/super_admin/widgets/pending_approval_table.dart';
-import 'package:tms/modules/super_admin/widgets/super_admin_sidebar.dart';
 import 'package:tms/shared/widgets/app_top_bar.dart';
 
-class AccessControlView extends GetView<AccessControlController> {
-  const AccessControlView({super.key});
+class AccessControlView
+    extends GetView<AccessControlController> {
+  const AccessControlView({
+    super.key,
+    this.onMenuPressed,
+  });
+
+  final VoidCallback? onMenuPressed;
 
   @override
   Widget build(BuildContext context) {
-    final scaffoldKey = GlobalKey<ScaffoldState>();
-    final width = MediaQuery.sizeOf(context).width;
-    final isDesktop = AppBreakpoints.isDesktop(width);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    const sidebar = SuperAdminSidebar(currentRoute: AppRoutes.accessControl);
+    final isDark =
+        Theme.of(context).brightness ==
+            Brightness.dark;
 
-    return Scaffold(
-      key: scaffoldKey,
-      drawer: !isDesktop ? const Drawer(child: sidebar) : null,
-      body: Row(
-        children: [
-          if (isDesktop) sidebar,
-          Expanded(
-            child: Column(
-              children: [
-                // ── Top Bar (no Obx needed — no observables here) ──
-                AppTopBar(
-                  title: 'Access Control',
-                  subtitle: 'User Approvals & Assignments',
-                  userName: 'Super Admin',
-                  userRole: 'Super Admin',
-                  onMenuPressed: () => scaffoldKey.currentState?.openDrawer(),
-                ),
-                // ── Scrollable body — Expanded so it doesn't overflow ──
-                Expanded(
-                  child: RefreshIndicator(
-                    onRefresh: () =>
-                        controller.fetchPendingUsers(refresh: true),
-                    child: SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      padding: const EdgeInsets.all(AppSpacing.xl),
-                      child: Center(
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(
-                            maxWidth: AppSizes.maxContentWidth,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Breadcrumb
-                              Text(
-                                '> Access Control',
-                                style: AppTypography.labelSm(
-                                    color: _muted(isDark)),
-                              ),
-                              const SizedBox(height: AppSpacing.sm),
-                              // Page title
-                              Text(
-                                'User Approvals & Assignments',
-                                style: AppTypography.headlineMd(
-                                    color: _text(isDark)),
-                              ),
-                              const SizedBox(height: AppSpacing.xs),
-                              // Subtitle — blue to match image
-                              ConstrainedBox(
-                                constraints:
-                                    const BoxConstraints(maxWidth: 760),
-                                child: Text(
-                                  'Review and authorize pending registrations, assign departments to administrators, and define roles for employees.',
-                                  style: AppTypography.bodyMd(
-                                      color: AppColors.secondary),
-                                ),
-                              ),
-                              const SizedBox(height: AppSpacing.xl),
+    return Column(
+      children: [
+        // ==========================================================
+        // TOP BAR
+        // ==========================================================
+        AppTopBar(
+          title: 'Access Control',
+          subtitle:
+              'User Approvals & Assignments',
+          userName: 'Super Admin',
+          userRole: 'Super Admin',
+          onMenuPressed:
+              onMenuPressed,
+        ),
 
-                              // ── Tabs — must be inside Obx that reads observables ──
-                              Obx(() => _Tabs(controller: controller)),
-                              const SizedBox(height: AppSpacing.xl),
+        // ==========================================================
+        // BODY
+        // ==========================================================
+        Expanded(
+          child: RefreshIndicator(
+            onRefresh: () =>
+                controller.fetchPendingUsers(
+              refresh: true,
+            ),
 
-                              // ── Main content — must be inside Obx that reads observables ──
-                              Obx(() {
-                                final refreshKey = Object.hashAll([
-                                  controller.selectedTab.value,
-                                  controller.totalPending.value,
-                                  controller.summaryAdmins.value,
-                                  controller.summaryEmployees.value,
-                                  controller.isLoading.value,
-                                  controller.errorMessage.value,
-                                  controller.pendingUsers.length,
-                                  controller.searchQuery.value,
-                                  controller.currentPage.value,
-                                  controller.pageSize.value,
-                                ]);
+            child: SingleChildScrollView(
+              physics:
+                  const AlwaysScrollableScrollPhysics(),
 
-                                return KeyedSubtree(
-                                  key: ValueKey(refreshKey),
-                                  child: _ContentLayout(
-                                    controller: controller,
-                                    isDark: isDark,
-                                  ),
-                                );
-                              }),
-                            ],
+              padding:
+                  const EdgeInsets.all(
+                AppSpacing.xl,
+              ),
+
+              child: Center(
+                child: ConstrainedBox(
+                  constraints:
+                      const BoxConstraints(
+                    maxWidth:
+                        AppSizes
+                            .maxContentWidth,
+                  ),
+
+                  child: Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment
+                            .start,
+
+                    children: [
+                      // ==================================================
+                      // BREADCRUMB
+                      // ==================================================
+                      Text(
+                        '> Access Control',
+                        style:
+                            AppTypography
+                                .labelSm(
+                          color:
+                              _muted(
+                            isDark,
                           ),
                         ),
                       ),
-                    ),
+
+                      const SizedBox(
+                        height:
+                            AppSpacing.sm,
+                      ),
+
+                      // ==================================================
+                      // TITLE
+                      // ==================================================
+                      Text(
+                        'User Approvals & Assignments',
+                        style:
+                            AppTypography
+                                .headlineMd(
+                          color:
+                              _text(
+                            isDark,
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(
+                        height:
+                            AppSpacing.xs,
+                      ),
+
+                      ConstrainedBox(
+                        constraints:
+                            const BoxConstraints(
+                          maxWidth: 760,
+                        ),
+                        child: Text(
+                          'Review and authorize pending registrations, assign departments to administrators, and define roles for employees.',
+                          style:
+                              AppTypography
+                                  .bodyMd(
+                            color:
+                                AppColors
+                                    .secondary,
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(
+                        height:
+                            AppSpacing.xl,
+                      ),
+
+                      // ==================================================
+                      // TABS
+                      // ==================================================
+                      Obx(
+                        () => _Tabs(
+                          controller:
+                              controller,
+                        ),
+                      ),
+
+                      const SizedBox(
+                        height:
+                            AppSpacing.xl,
+                      ),
+
+                      // ==================================================
+                      // CONTENT
+                      // ==================================================
+                      Obx(
+                        () => _ContentLayout(
+                          controller:
+                              controller,
+                          isDark:
+                              isDark,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
 
 // ============================================================================
-// Content Layout — pending table + right sidebar
+// CONTENT LAYOUT
 // ============================================================================
 
-class _ContentLayout extends StatelessWidget {
+class _ContentLayout
+    extends StatelessWidget {
   const _ContentLayout({
     required this.controller,
     required this.isDark,
@@ -137,109 +188,243 @@ class _ContentLayout extends StatelessWidget {
   final bool isDark;
 
   @override
-  Widget build(BuildContext context) {
-    // "Delete" tab — empty state
-    if (controller.selectedTab.value == 1) {
+  Widget build(
+    BuildContext context,
+  ) {
+    // ==============================================================
+    // DELETE TAB
+    // ==============================================================
+
+    if (controller.selectedTab.value ==
+        1) {
       return Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(AppSpacing.xl),
-        decoration: BoxDecoration(
+
+        padding:
+            const EdgeInsets.all(
+          AppSpacing.xl,
+        ),
+
+        decoration:
+            BoxDecoration(
           color: isDark
               ? AppColors.darkSurface
-              : AppColors.surfaceContainerLowest,
-          borderRadius: AppRadius.borderMd,
-          border: Border.all(color: AppColors.outlineVariant),
+              : AppColors
+                  .surfaceContainerLowest,
+
+          borderRadius:
+              AppRadius.borderMd,
+
+          border: Border.all(
+            color:
+                AppColors
+                    .outlineVariant,
+          ),
         ),
+
         child: Column(
           children: [
-            const Icon(Icons.delete_outline,
-                color: AppColors.outline, size: AppSizes.iconXl),
-            const SizedBox(height: AppSpacing.md),
-            Text('No deleted registrations',
-                style: AppTypography.titleLg()),
-            const SizedBox(height: AppSpacing.xs),
+            const Icon(
+              Icons.delete_outline,
+              color:
+                  AppColors.outline,
+              size:
+                  AppSizes.iconXl,
+            ),
+
+            const SizedBox(
+              height:
+                  AppSpacing.md,
+            ),
+
+            Text(
+              'No deleted registrations',
+              style:
+                  AppTypography
+                      .titleLg(),
+            ),
+
+            const SizedBox(
+              height:
+                  AppSpacing.xs,
+            ),
+
             Text(
               'Rejected or removed user requests will be managed through existing user administration tools.',
-              style: AppTypography.bodyMd(
-                  color: AppColors.onSurfaceVariant),
-              textAlign: TextAlign.center,
+              style:
+                  AppTypography
+                      .bodyMd(
+                color:
+                    AppColors
+                        .onSurfaceVariant,
+              ),
+              textAlign:
+                  TextAlign.center,
             ),
           ],
         ),
       );
     }
 
-    // Pending Approvals tab
+    // ==============================================================
+    // PENDING APPROVALS
+    // ==============================================================
+
     final isDesktop =
-        AppBreakpoints.isDesktop(MediaQuery.sizeOf(context).width);
+        AppBreakpoints.isDesktop(
+      MediaQuery.sizeOf(context)
+          .width,
+    );
 
-    final table = PendingApprovalTable(controller: controller);
+    final table =
+        PendingApprovalTable(
+      controller: controller,
+    );
 
-    final side = Column(
+    final side =
+        Column(
       children: [
         QueueSummaryCard(
-          total: controller.totalPending.value,
-          admins: controller.adminPendingCount,
-          employees: controller.employeePendingCount,
-          onExport: controller.exportCurrentList,
+          total:
+              controller
+                  .totalPending
+                  .value,
+          admins:
+              controller
+                  .adminPendingCount,
+          employees:
+              controller
+                  .employeePendingCount,
+          onExport:
+              controller
+                  .exportCurrentList,
         ),
-        const SizedBox(height: AppSpacing.md),
+
+        const SizedBox(
+          height:
+              AppSpacing.md,
+        ),
+
         const AssignmentRulesCard(),
       ],
     );
 
+    // ==============================================================
+    // MOBILE
+    // ==============================================================
+
     if (!isDesktop) {
-      return Column(children: [
-        table,
-        const SizedBox(height: AppSpacing.md),
-        side,
-      ]);
+      return Column(
+        children: [
+          table,
+
+          const SizedBox(
+            height:
+                AppSpacing.md,
+          ),
+
+          side,
+        ],
+      );
     }
 
+    // ==============================================================
+    // DESKTOP
+    // ==============================================================
+
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment:
+          CrossAxisAlignment
+              .start,
+
       children: [
-        Expanded(child: table),
-        const SizedBox(width: AppSpacing.lg),
-        SizedBox(width: 280, child: side),
+        Expanded(
+          child: table,
+        ),
+
+        const SizedBox(
+          width:
+              AppSpacing.lg,
+        ),
+
+        SizedBox(
+          width: 280,
+          child: side,
+        ),
       ],
     );
   }
 }
 
 // ============================================================================
-// Tabs row
+// TABS
 // ============================================================================
 
-class _Tabs extends StatelessWidget {
-  const _Tabs({required this.controller});
+class _Tabs
+    extends StatelessWidget {
+  const _Tabs({
+    required this.controller,
+  });
 
   final AccessControlController controller;
 
   @override
-  Widget build(BuildContext context) {
-    // Reading observables HERE — inside the Obx above
-    final selected = controller.selectedTab.value;
-    final total = controller.totalPending.value;
+  Widget build(
+    BuildContext context,
+  ) {
+    final selected =
+        controller
+            .selectedTab
+            .value;
+
+    final total =
+        controller
+            .totalPending
+            .value;
 
     return Container(
-      decoration: const BoxDecoration(
-        border:
-            Border(bottom: BorderSide(color: AppColors.outlineVariant)),
+      decoration:
+          const BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color:
+                AppColors
+                    .outlineVariant,
+          ),
+        ),
       ),
+
       child: Row(
         children: [
           _TabButton(
-            label: 'Pending Approvals',
-            count: total,
-            selected: selected == 0,
-            onTap: () => controller.selectedTab.value = 0,
+            label:
+                'Pending Approvals',
+            count:
+                total,
+            selected:
+                selected == 0,
+            onTap: () {
+              controller
+                  .selectedTab
+                  .value = 0;
+            },
           ),
-          const SizedBox(width: AppSpacing.lg),
+
+          const SizedBox(
+            width:
+                AppSpacing.lg,
+          ),
+
           _TabButton(
-            label: 'Delete',
-            selected: selected == 1,
-            onTap: () => controller.selectedTab.value = 1,
+            label:
+                'Delete',
+            selected:
+                selected == 1,
+            onTap: () {
+              controller
+                  .selectedTab
+                  .value = 1;
+            },
           ),
         ],
       ),
@@ -248,10 +433,11 @@ class _Tabs extends StatelessWidget {
 }
 
 // ============================================================================
-// Individual tab button
+// TAB BUTTON
 // ============================================================================
 
-class _TabButton extends StatelessWidget {
+class _TabButton
+    extends StatelessWidget {
   const _TabButton({
     required this.label,
     required this.selected,
@@ -265,47 +451,95 @@ class _TabButton extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    const activeColor = AppColors.secondary;
-    final inactiveColor = isDark
-        ? AppColors.darkOnSurfaceVariant
-        : AppColors.onSurfaceVariant;
+  Widget build(
+    BuildContext context,
+  ) {
+    final isDark =
+        Theme.of(context).brightness ==
+            Brightness.dark;
+
+    const activeColor =
+        AppColors.secondary;
+
+    final inactiveColor =
+        isDark
+            ? AppColors
+                .darkOnSurfaceVariant
+            : AppColors
+                .onSurfaceVariant;
 
     return InkWell(
       onTap: onTap,
-      borderRadius: AppRadius.borderSm,
+
+      borderRadius:
+          AppRadius.borderSm,
+
       child: Container(
-        padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-        decoration: BoxDecoration(
+        padding:
+            const EdgeInsets.only(
+          bottom:
+              AppSpacing.sm,
+        ),
+
+        decoration:
+            BoxDecoration(
           border: Border(
             bottom: BorderSide(
-              color: selected ? activeColor : Colors.transparent,
+              color: selected
+                  ? activeColor
+                  : Colors.transparent,
               width: 2,
             ),
           ),
         ),
+
         child: Row(
           children: [
             Text(
               label,
-              style: AppTypography.labelMd(
-                color: selected ? activeColor : inactiveColor,
-                fontWeight: FontWeight.w700,
+              style:
+                  AppTypography
+                      .labelMd(
+                color: selected
+                    ? activeColor
+                    : inactiveColor,
+                fontWeight:
+                    FontWeight.w700,
               ),
             ),
-            if (count != null && count! > 0) ...[
-              const SizedBox(width: AppSpacing.xs),
+
+            if (count != null &&
+                count! > 0) ...[
+              const SizedBox(
+                width:
+                    AppSpacing.xs,
+              ),
+
               Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 6, vertical: 1),
-                decoration: const BoxDecoration(
-                  color: AppColors.secondary,
-                  borderRadius: AppRadius.borderFull,
+                padding:
+                    const EdgeInsets
+                        .symmetric(
+                  horizontal: 6,
+                  vertical: 1,
                 ),
+
+                decoration:
+                    const BoxDecoration(
+                  color:
+                      AppColors.secondary,
+                  borderRadius:
+                      AppRadius
+                          .borderFull,
+                ),
+
                 child: Text(
                   '$count',
-                  style: AppTypography.labelSm(color: Colors.white),
+                  style:
+                      AppTypography
+                          .labelSm(
+                    color:
+                        Colors.white,
+                  ),
                 ),
               ),
             ],
@@ -316,7 +550,16 @@ class _TabButton extends StatelessWidget {
   }
 }
 
+// ============================================================================
+// COLORS
+// ============================================================================
+
 Color _text(bool isDark) =>
-    isDark ? AppColors.darkOnSurface : AppColors.onSurface;
+    isDark
+        ? AppColors.darkOnSurface
+        : AppColors.onSurface;
+
 Color _muted(bool isDark) =>
-    isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant;
+    isDark
+        ? AppColors.darkOnSurfaceVariant
+        : AppColors.onSurfaceVariant;
