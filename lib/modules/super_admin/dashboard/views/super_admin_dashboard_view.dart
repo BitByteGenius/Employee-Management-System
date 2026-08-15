@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:tms/core/constants/app_colors.dart';
 import 'package:tms/core/constants/app_sizes.dart';
 import 'package:tms/core/constants/app_typography.dart';
-import 'package:tms/modules/super_admin/controllers/super_admin_dashboard_controller.dart';
+import 'package:tms/modules/super_admin/dashboard/controllers/super_admin_dashboard_controller.dart';
 import 'package:tms/shared/widgets/app_data_table.dart';
 import 'package:tms/shared/widgets/app_stat_card.dart';
 import 'package:tms/shared/widgets/app_state_widgets.dart';

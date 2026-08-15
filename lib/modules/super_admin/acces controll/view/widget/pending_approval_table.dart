@@ -3,9 +3,9 @@ import 'package:tms/core/constants/app_colors.dart';
 import 'package:tms/core/constants/app_sizes.dart';
 import 'package:tms/core/constants/app_typography.dart';
 import 'package:tms/core/utils/app_date_formatter.dart';
-import 'package:tms/modules/super_admin/controllers/access_control_controller.dart';
-import 'package:tms/modules/super_admin/models/access_control_pending_user.dart';
-import 'package:tms/modules/super_admin/widgets/access_control_dialogs.dart';
+import 'package:tms/modules/super_admin/acces%20controll/controller/access_control_controller.dart';
+import 'package:tms/modules/super_admin/acces%20controll/models/access_control_pending_user.dart';
+import 'package:tms/modules/super_admin/acces%20controll/view/widget/access_control_dialogs.dart';
 import 'package:tms/shared/widgets/app_state_widgets.dart';
 
 // ============================================================================

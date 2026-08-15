@@ -8,9 +8,9 @@ import 'package:tms/modules/employee/bindings/employee_dashboard_binding.dart';
 import 'package:tms/modules/employee/views/employee_dashboard_view.dart';
 import 'package:tms/modules/splash/bindings/splash_binding.dart';
 import 'package:tms/modules/splash/views/splash_view.dart';
-import 'package:tms/modules/super_admin/bindings/super_admin_dashboard_binding.dart';
+import 'package:tms/modules/super_admin/dashboard/bindings/super_admin_dashboard_binding.dart';
 
-import 'package:tms/modules/super_admin/views/super_admin_shell_view.dart';
+import 'package:tms/modules/super_admin/dashboard/views/super_admin_shell_view.dart';
 
 part 'app_routes.dart';
 

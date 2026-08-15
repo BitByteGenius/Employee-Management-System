@@ -268,7 +268,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:tms/core/constants/api_endpoints.dart';
 import 'package:tms/core/network/api_client.dart';
-import 'package:tms/modules/super_admin/models/access_control_pending_user.dart';
+import 'package:tms/modules/super_admin/acces%20controll/models/access_control_pending_user.dart';
 
 class AccessControlController extends GetxController {
   final isLoading = false.obs;

@@ -3,10 +3,10 @@ import 'package:get/get.dart';
 
 import 'package:tms/core/constants/app_sizes.dart';
 import 'package:tms/core/routes/app_pages.dart';
-import 'package:tms/modules/super_admin/controllers/super_admin_shell_controller.dart';
-import 'package:tms/modules/super_admin/views/access_control_view.dart';
-import 'package:tms/modules/super_admin/views/super_admin_dashboard_view.dart';
-import 'package:tms/modules/super_admin/widgets/super_admin_sidebar.dart';
+import 'package:tms/modules/super_admin/dashboard/controllers/super_admin_shell_controller.dart';
+import 'package:tms/modules/super_admin/acces%20controll/view/access_control_view.dart';
+import 'package:tms/modules/super_admin/dashboard/views/super_admin_dashboard_view.dart';
+import 'package:tms/modules/super_admin/dashboard/views/widgets/super_admin_sidebar.dart';
 
 class SuperAdminShellView extends StatefulWidget {
   const SuperAdminShellView({

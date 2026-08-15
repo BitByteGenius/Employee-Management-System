@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
 
-import 'package:tms/modules/super_admin/controllers/access_control_controller.dart';
-import 'package:tms/modules/super_admin/controllers/super_admin_dashboard_controller.dart';
-import 'package:tms/modules/super_admin/controllers/super_admin_shell_controller.dart';
+import 'package:tms/modules/super_admin/acces%20controll/controller/access_control_controller.dart';
+import 'package:tms/modules/super_admin/dashboard/controllers/super_admin_dashboard_controller.dart';
+import 'package:tms/modules/super_admin/dashboard/controllers/super_admin_shell_controller.dart';
 
 class SuperAdminDashboardBinding extends Bindings {
   @override
