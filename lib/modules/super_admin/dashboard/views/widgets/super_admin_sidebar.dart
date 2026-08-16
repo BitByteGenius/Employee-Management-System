@@ -94,13 +94,13 @@ class SuperAdminSidebar extends StatelessWidget {
                   ),
 
                   _buildMenuItem(
-                    context: context,
-                    icon: Icons.work_outline,
-                    selectedIcon: Icons.work,
-                    title: 'Projects',
-                    route: AppRoutes.projects,
-                    isDark: isDark,
-                  ),
+  context: context,
+  icon: Icons.work_outline,
+  selectedIcon: Icons.work,
+  title: 'Projects',
+  route: AppRoutes.superAdminProject, 
+  isDark: isDark,
+),
 
                   _buildMenuItem(
                     context: context,

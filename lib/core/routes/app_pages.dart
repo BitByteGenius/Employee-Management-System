@@ -8,9 +8,12 @@ import 'package:tms/modules/employee/bindings/employee_dashboard_binding.dart';
 import 'package:tms/modules/employee/views/employee_dashboard_view.dart';
 import 'package:tms/modules/splash/bindings/splash_binding.dart';
 import 'package:tms/modules/splash/views/splash_view.dart';
+import 'package:tms/modules/super_admin/acces%20controll/bindings/access_control_binding.dart';
 import 'package:tms/modules/super_admin/dashboard/bindings/super_admin_dashboard_binding.dart';
+import 'package:tms/modules/super_admin/projects/blindings/project_blindings.dart';
 
 import 'package:tms/modules/super_admin/dashboard/views/super_admin_shell_view.dart';
+import 'package:tms/modules/super_admin/projects/view/projects_overview_screen.dart';
 
 part 'app_routes.dart';
 
@@ -44,8 +47,16 @@ class AppPages {
       page: () => const SuperAdminShellView(
         initialRoute: AppRoutes.accessControl,
       ),
-      binding: SuperAdminDashboardBinding(),
+      binding: AccessControlBinding(),
     ),
+   GetPage(
+  name: AppRoutes.superAdminProject,
+  page: () => const SuperAdminShellView(
+    initialRoute: AppRoutes.superAdminProject,
+  ),
+  binding: SuperAdminProjectBinding(),
+),
+
     GetPage(
       name: AppRoutes.adminDashboard,
       page: () => const AdminDashboardView(),

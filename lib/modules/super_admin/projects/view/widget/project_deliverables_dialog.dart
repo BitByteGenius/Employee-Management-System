@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:tms/core/constants/app_colors.dart';
 import 'package:tms/core/constants/app_sizes.dart';
 import 'package:tms/core/constants/app_typography.dart';
-import 'package:tms/modules/project/controllers/project_controller.dart';
+import 'package:tms/modules/super_admin/projects/controller/project_controller.dart';
 import 'package:tms/modules/super_admin/projects/view/widget/dashed_border_painter.dart';
 
 class ProjectDeliverablesDialog extends GetView<ProjectController> {

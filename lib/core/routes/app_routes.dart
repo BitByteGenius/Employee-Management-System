@@ -10,10 +10,13 @@ abstract class AppRoutes {
   static const String register = '/register';
   static const String forgotPassword = '/forgot-password';
 
-
   // Dashboards
   static const String superAdminDashboard = '/super-admin/dashboard';
   static const String accessControl = '/super-admin/access-control';
+  
+  // ✅ FIXED: Added leading slash '/'
+  static const String superAdminProject = '/super-admin/ProjectsOverviewScreen'; 
+  
   static const String adminDashboard = '/admin/dashboard';
   static const String employeeDashboard = '/employee/dashboard';
 

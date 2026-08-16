@@ -36,6 +36,7 @@ class ApiEndpoints {
   static const String roles = '/roles';
   static const String settings = '/settings';
   static const String auditLogs = '/audit-logs';
+  static String projectDeliverables(String id) => '/projects/$id/deliverables';
 
   // Analytics & Reports
   static const String analyticsSummary = '/analytics/summary';
