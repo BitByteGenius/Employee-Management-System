@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:tms/modules/department/models/create_department_request.dart';
 import 'package:tms/modules/department/models/department_employee_model.dart';
 import 'package:tms/modules/department/models/department_models.dart';
@@ -52,41 +54,27 @@ class DepartmentRepository {
     }
 
     final pagination =
-        json['pagination'] is Map
-            ? Map<String, dynamic>.from(
-                json['pagination'],
-              )
-            : <String, dynamic>{};
+        json['pagination'] as Map<String, dynamic>?;
 
     return DepartmentListResult(
       departments: items,
-      page: _int(
-        pagination['page'],
-        fallback: page,
-      ),
-      totalPages: _int(
-        pagination['totalPages'],
-        fallback: 1,
-      ),
+      page: _int(pagination?['page'], fallback: page),
+      totalPages:
+          _int(pagination?['totalPages'], fallback: 1),
       total: _int(
-        pagination['total'],
+        pagination?['total'],
         fallback: items.length,
       ),
     );
   }
 
   // ==========================================================================
-  // DETAIL
+  // GET SINGLE
   // ==========================================================================
 
-  Future<DepartmentModel> getDepartment(
-    String id,
-  ) async {
-    final response =
-        await service.getDepartment(id);
-
+  Future<DepartmentModel> getDepartment(String id) async {
+    final response = await service.getDepartment(id);
     final json = _map(response);
-
     final data = _extractData(json);
 
     return DepartmentModel.fromJson(data);
@@ -101,12 +89,10 @@ class DepartmentRepository {
   ) async {
     final response =
         await service.createDepartment(request);
-
     final json = _map(response);
+    final data = _extractData(json);
 
-    return DepartmentModel.fromJson(
-      _extractData(json),
-    );
+    return DepartmentModel.fromJson(data);
   }
 
   // ==========================================================================
@@ -119,53 +105,50 @@ class DepartmentRepository {
   ) async {
     final response =
         await service.updateDepartment(id, data);
-
     final json = _map(response);
+    final extracted = _extractData(json);
 
-    return DepartmentModel.fromJson(
-      _extractData(json),
-    );
+    return DepartmentModel.fromJson(extracted);
   }
 
   // ==========================================================================
-  // DELETE
+  // STATUS
   // ==========================================================================
 
-  Future<void> deleteDepartment(
+  Future<DepartmentModel> updateStatus(
     String id,
+    String status,
   ) async {
-    await service.deleteDepartment(id);
+    final response =
+        await service.updateDepartment(id, {'status': status});
+    final json = _map(response);
+    final data = _extractData(json);
+
+    return DepartmentModel.fromJson(data);
   }
 
   // ==========================================================================
-  // ASSIGN ADMIN
+  // ADMIN
   // ==========================================================================
 
   Future<DepartmentModel> assignAdmin(
-    String departmentId,
+    String id,
     String adminId,
   ) async {
     final response =
-        await service.assignAdmin(
-      departmentId,
-      adminId,
-    );
-
+        await service.assignAdmin(id, adminId);
     final json = _map(response);
+    final data = _extractData(json);
 
-    return DepartmentModel.fromJson(
-      _extractData(json),
-    );
+    return DepartmentModel.fromJson(data);
   }
 
-  // ==========================================================================
-  // REMOVE ADMIN
-  // ==========================================================================
+  Future<DepartmentModel> removeAdmin(String id) async {
+    final response = await service.removeAdmin(id);
+    final json = _map(response);
+    final data = _extractData(json);
 
-  Future<void> removeAdmin(
-    String departmentId,
-  ) async {
-    await service.removeAdmin(departmentId);
+    return DepartmentModel.fromJson(data);
   }
 
   // ==========================================================================
@@ -173,11 +156,15 @@ class DepartmentRepository {
   // ==========================================================================
 
   Future<List<DepartmentEmployeeModel>> getEmployees(
-    String departmentId, {
+    String id, {
+    int page = 1,
+    int limit = 20,
     String? search,
   }) async {
     final response = await service.getEmployees(
-      departmentId,
+      id,
+      page: page,
+      limit: limit,
       search: search,
     );
 
@@ -185,37 +172,47 @@ class DepartmentRepository {
 
     final raw =
         json['employees'] ??
-        json['items'] ??
+        json['users'] ??
         json['data'] ??
         [];
 
-    if (raw is! List) {
-      return [];
+    final items = <DepartmentEmployeeModel>[];
+
+    if (raw is List) {
+      for (final item in raw) {
+        if (item is Map) {
+          items.add(
+            DepartmentEmployeeModel.fromJson(
+              Map<String, dynamic>.from(item),
+            ),
+          );
+        }
+      }
     }
 
-    return raw
-        .whereType<Map>()
-        .map(
-          (item) => DepartmentEmployeeModel.fromJson(
-            Map<String, dynamic>.from(item),
-          ),
-        )
-        .toList();
+    return items;
   }
 
   // ==========================================================================
-  // SEARCH USERS
+  // DELETE
+  // ==========================================================================
+
+  Future<bool> deleteDepartment(String id) async {
+    final response = await service.deleteDepartment(id);
+    final json = _map(response);
+
+    return json['success'] == true ||
+        response is! Map ||
+        response['success'] == true;
+  }
+
+  // ==========================================================================
+  // SEARCH USERS (for Admin selection)
   // ==========================================================================
 
   Future<List<DepartmentEmployeeModel>> searchUsers(String query) async {
     try {
       final response = await service.searchUsers(query);
-      if (response is List) {
-        return response
-            .whereType<Map>()
-            .map((item) => DepartmentEmployeeModel.fromJson(Map<String, dynamic>.from(item)))
-            .toList();
-      }
       final json = _map(response);
       final raw = json['data'] ?? json['users'] ?? json['items'] ?? [];
 
@@ -225,7 +222,16 @@ class DepartmentRepository {
             .map((item) => DepartmentEmployeeModel.fromJson(Map<String, dynamic>.from(item)))
             .toList();
       }
-    } catch (_) {}
+
+      if (response is List) {
+        return response
+            .whereType<Map>()
+            .map((item) => DepartmentEmployeeModel.fromJson(Map<String, dynamic>.from(item)))
+            .toList();
+      }
+    } catch (e) {
+      debugPrint('[DepartmentRepository] searchUsers error: $e');
+    }
     return [];
   }
 
@@ -233,23 +239,20 @@ class DepartmentRepository {
   // HELPERS
   // ==========================================================================
 
-  Map<String, dynamic> _map(
-    dynamic response,
-  ) {
+  Map<String, dynamic> _map(dynamic response) {
+    if (response is Response) {
+      return _map(response.data);
+    }
     if (response is Map<String, dynamic>) {
       return response;
     }
-
     if (response is Map) {
       return Map<String, dynamic>.from(response);
     }
-
     return {};
   }
 
-  Map<String, dynamic> _extractData(
-    Map<String, dynamic> json,
-  ) {
+  Map<String, dynamic> _extractData(Map<String, dynamic> json) {
     final data = json['data'];
 
     if (data is Map<String, dynamic>) {

@@ -640,14 +640,7 @@ class _ContentLayout extends StatelessWidget {
                   TextField(
                     controller: searchController,
                     onChanged: (val) {
-                      if (val.trim().isNotEmpty) {
-                        controller.searchAdminCandidates(val.trim()).then((_) => setState(() {}));
-                      } else {
-                        setState(() {
-                          chosenAdmin = null;
-                        });
-                        controller.adminCandidates.clear();
-                      }
+                      controller.searchAdminCandidates(val.trim()).then((_) => setState(() {}));
                     },
                     decoration: const InputDecoration(
                       hintText: 'Search user by name or email...',
@@ -692,7 +685,6 @@ class _ContentLayout extends StatelessWidget {
                                 chosenAdmin = cand;
                                 searchController.text = '${cand.name} (${cand.email})';
                               });
-                              controller.adminCandidates.clear();
                             },
                           );
                         },
