@@ -19,11 +19,11 @@ class AppTheme {
         color: AppColors.surfaceContainerLowest,
         shape: RoundedRectangleBorder(
           borderRadius: AppRadius.borderLg,
-          side: BorderSide(color: AppColors.outlineVariant.withOpacity(0.5), width: 1),
+          side: BorderSide(color: AppColors.outlineVariant.withValues(alpha: 0.5), width: 1),
         ),
       ),
       dividerTheme: DividerThemeData(
-        color: AppColors.outlineVariant.withOpacity(0.3),
+        color: AppColors.outlineVariant.withValues(alpha: 0.3),
         thickness: 1,
         space: 1,
       ),
@@ -120,7 +120,7 @@ class AppTheme {
     error: AppColors.error,
     onError: AppColors.onError,
     outline: AppColors.outline,
-    outlineVariant: Colors.white.withOpacity(0.15),
+    outlineVariant: Colors.white.withValues(alpha: 0.15),
   );
 }
 

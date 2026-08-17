@@ -234,8 +234,8 @@ class AdminDashboardView extends GetView<AdminDashboardController> {
         borderRadius: AppRadius.borderLg,
         border: Border.all(
           color: isDark
-              ? Colors.white.withOpacity(0.1)
-              : AppColors.outlineVariant.withOpacity(0.5),
+              ? Colors.white.withValues(alpha: 0.1)
+              : AppColors.outlineVariant.withValues(alpha: 0.5),
         ),
       ),
       child: Column(
@@ -308,8 +308,8 @@ class AdminDashboardView extends GetView<AdminDashboardController> {
         borderRadius: AppRadius.borderLg,
         border: Border.all(
           color: isDark
-              ? Colors.white.withOpacity(0.1)
-              : AppColors.outlineVariant.withOpacity(0.5),
+              ? Colors.white.withValues(alpha: 0.1)
+              : AppColors.outlineVariant.withValues(alpha: 0.5),
         ),
       ),
       child: Column(

@@ -262,8 +262,8 @@ class EmployeeDashboardView extends GetView<EmployeeDashboardController> {
               borderRadius: AppRadius.borderLg,
               border: Border.all(
                 color: isDark
-                    ? Colors.white.withOpacity(0.1)
-                    : AppColors.outlineVariant.withOpacity(0.5),
+                    ? Colors.white.withValues(alpha: 0.1)
+                    : AppColors.outlineVariant.withValues(alpha: 0.5),
               ),
             ),
             child: Column(
@@ -329,8 +329,8 @@ class EmployeeDashboardView extends GetView<EmployeeDashboardController> {
             borderRadius: AppRadius.borderLg,
             border: Border.all(
               color: isDark
-                  ? Colors.white.withOpacity(0.1)
-                  : AppColors.outlineVariant.withOpacity(0.5),
+                  ? Colors.white.withValues(alpha: 0.1)
+                  : AppColors.outlineVariant.withValues(alpha: 0.5),
             ),
           ),
           child: Column(
@@ -408,8 +408,8 @@ class EmployeeDashboardView extends GetView<EmployeeDashboardController> {
             borderRadius: AppRadius.borderLg,
             border: Border.all(
               color: isDark
-                  ? Colors.white.withOpacity(0.1)
-                  : AppColors.outlineVariant.withOpacity(0.5),
+                  ? Colors.white.withValues(alpha: 0.1)
+                  : AppColors.outlineVariant.withValues(alpha: 0.5),
             ),
           ),
           child: Column(
@@ -439,8 +439,8 @@ class EmployeeDashboardView extends GetView<EmployeeDashboardController> {
                       borderRadius: AppRadius.borderMd,
                       border: Border.all(
                         color: isDark
-                            ? Colors.white.withOpacity(0.05)
-                            : AppColors.outlineVariant.withOpacity(0.3),
+                            ? Colors.white.withValues(alpha: 0.05)
+                            : AppColors.outlineVariant.withValues(alpha: 0.3),
                       ),
                     ),
                     child: Row(
@@ -450,8 +450,8 @@ class EmployeeDashboardView extends GetView<EmployeeDashboardController> {
                           height: 32,
                           decoration: BoxDecoration(
                             color: isWarn
-                                ? AppColors.error.withOpacity(0.15)
-                                : AppColors.secondary.withOpacity(0.15),
+                                ? AppColors.error.withValues(alpha: 0.15)
+                                : AppColors.secondary.withValues(alpha: 0.15),
                             borderRadius: AppRadius.borderSm,
                           ),
                           child: Icon(

@@ -10,14 +10,16 @@ abstract class AppRoutes {
   static const String register = '/register';
   static const String forgotPassword = '/forgot-password';
 
-
-  // Dashboards
+  // super admin Dashboards
   static const String superAdminDashboard = '/super-admin/dashboard';
+  static const String accessControl = '/super-admin/access-control';
+  static const String departments = '/super-admin/departments';
+  static const String superAdminProject = '/super-admin/projects';
+
   static const String adminDashboard = '/admin/dashboard';
   static const String employeeDashboard = '/employee/dashboard';
 
   // Core Features
-  static const String departments = '/departments';
   static const String projects = '/projects';
   static const String tasks = '/tasks';
   static const String reports = '/reports';

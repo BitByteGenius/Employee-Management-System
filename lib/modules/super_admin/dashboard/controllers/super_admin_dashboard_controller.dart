@@ -70,15 +70,23 @@ class SuperAdminDashboardController extends GetxController {
           final List list = usersRes.data['data'] ?? [];
           final parsed = list.cast<Map<String, dynamic>>();
           allUsers.assignAll(parsed);
-          final pending = parsed.where((u) => u['accountStatus'] == 'pending' || u['status'] == 'pending').toList();
-          pendingUsers.assignAll(pending);
-          pendingApprovalsCount.value = pending.length;
           totalAdmins.value = parsed.where((u) => u['role'] == 'admin').length;
           totalEmployees.value = parsed.where((u) => u['role'] == 'employee').length;
         }
       } catch (_) {}
 
-      // 3. Fetch Audit Logs
+      // 3. Fetch Pending Approvals
+      try {
+        final pendingRes = await _api.dio.get(ApiEndpoints.pendingUsers);
+        if (pendingRes.data != null && pendingRes.data['success'] == true) {
+          final List list = pendingRes.data['data'] ?? [];
+          final parsed = list.cast<Map<String, dynamic>>();
+          pendingUsers.assignAll(parsed);
+          pendingApprovalsCount.value = parsed.length;
+        }
+      } catch (_) {}
+
+      // 4. Fetch Audit Logs
       try {
         final auditRes = await _api.dio.get(ApiEndpoints.auditLogs);
         if (auditRes.data != null && auditRes.data['success'] == true) {
@@ -87,7 +95,7 @@ class SuperAdminDashboardController extends GetxController {
         }
       } catch (_) {}
 
-      // 4. Fetch Portfolio Projects
+      // 5. Fetch Portfolio Projects
       try {
         final projRes = await _api.dio.get(ApiEndpoints.projects);
         if (projRes.data != null && projRes.data['success'] == true) {
@@ -148,5 +156,4 @@ class SuperAdminDashboardController extends GetxController {
     }
   }
 }
-
 

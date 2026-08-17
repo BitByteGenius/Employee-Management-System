@@ -42,7 +42,9 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final themeController = Get.find<ThemeController>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final isMobile = AppBreakpoints.isMobile(MediaQuery.sizeOf(context).width);
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isMobile = AppBreakpoints.isMobile(screenWidth);
+    final showSearch = screenWidth > 850;
 
     return Container(
       height: AppSizes.topBarHeight,
@@ -52,8 +54,8 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
         border: Border(
           bottom: BorderSide(
             color: isDark
-                ? Colors.white.withOpacity(0.1)
-                : AppColors.outlineVariant.withOpacity(0.5),
+                ? Colors.white.withValues(alpha: 0.1)
+                : AppColors.outlineVariant.withValues(alpha: 0.5),
             width: 1,
           ),
         ),
@@ -70,109 +72,122 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
           ],
 
           // Title / Breadcrumb
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: AppTypography.titleLg(
-                  color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
-                ),
-              ),
-              if (subtitle != null) ...[
-                const SizedBox(height: 2),
+          Flexible(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Text(
-                  subtitle!,
-                  style: AppTypography.labelSm(
-                    color: isDark
-                        ? AppColors.darkOnSurfaceVariant
-                        : AppColors.onSurfaceVariant,
+                  title,
+                  style: AppTypography.titleLg(
+                    color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
+                if (subtitle != null) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle!,
+                    style: AppTypography.labelSm(
+                      color: isDark
+                          ? AppColors.darkOnSurfaceVariant
+                          : AppColors.onSurfaceVariant,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
 
           // Optional Navigation Tabs (e.g., Admin Dashboard Overview, Team, Timeline)
           if (!isMobile && tabs != null && tabs!.isNotEmpty) ...[
-            const SizedBox(width: AppSpacing.xl),
-            Row(
-              children: List.generate(tabs!.length, (index) {
-                final selected = index == selectedTabIndex;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                  child: InkWell(
-                    onTap: () => onTabSelected?.call(index),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          tabs![index].toUpperCase(),
-                          style: AppTypography.labelMd(
-                            color: selected
-                                ? AppColors.secondary
-                                : (isDark
-                                    ? AppColors.darkOnSurfaceVariant
-                                    : AppColors.onSurfaceVariant),
-                            fontWeight:
-                                selected ? FontWeight.bold : FontWeight.w500,
-                          ),
+            const SizedBox(width: AppSpacing.md),
+            Flexible(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: List.generate(tabs!.length, (index) {
+                    final selected = index == selectedTabIndex;
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+                      child: InkWell(
+                        onTap: () => onTabSelected?.call(index),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              tabs![index].toUpperCase(),
+                              style: AppTypography.labelMd(
+                                color: selected
+                                    ? AppColors.secondary
+                                    : (isDark
+                                        ? AppColors.darkOnSurfaceVariant
+                                        : AppColors.onSurfaceVariant),
+                                fontWeight:
+                                    selected ? FontWeight.bold : FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Container(
+                              height: 2,
+                              width: 24,
+                              color: selected ? AppColors.secondary : Colors.transparent,
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 4),
-                        Container(
-                          height: 2,
-                          width: 24,
-                          color: selected ? AppColors.secondary : Colors.transparent,
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }),
+                      ),
+                    );
+                  }),
+                ),
+              ),
             ),
           ],
 
           const Spacer(),
 
           // Search Field (Desktop/Tablet)
-          if (!isMobile) ...[
-            Container(
-              width: 240,
-              height: 38,
-              decoration: BoxDecoration(
-                color: isDark
-                    ? AppColors.darkSurfaceContainer
-                    : AppColors.surfaceContainerLow,
-                borderRadius: AppRadius.borderFull,
-                border: Border.all(
-                  color: AppColors.outlineVariant.withOpacity(0.4),
-                  width: 1,
-                ),
-              ),
-              child: TextField(
-                onChanged: onSearchChanged,
-                style: AppTypography.bodyMd(
-                  color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
-                ),
-                decoration: InputDecoration(
-                  hintText: 'Search...',
-                  hintStyle: AppTypography.bodyMd(
-                    color: isDark
-                        ? AppColors.darkOnSurfaceVariant
-                        : AppColors.onSurfaceVariant,
+          if (showSearch) ...[
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 220, minWidth: 120),
+              child: Container(
+                height: 38,
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? AppColors.darkSurfaceContainer
+                      : AppColors.surfaceContainerLow,
+                  borderRadius: AppRadius.borderFull,
+                  border: Border.all(
+                    color: AppColors.outlineVariant.withValues(alpha: 0.4),
+                    width: 1,
                   ),
-                  prefixIcon: const Icon(
-                    Icons.search,
-                    size: AppSizes.iconMd,
-                    color: AppColors.outline,
+                ),
+                child: TextField(
+                  onChanged: onSearchChanged,
+                  style: AppTypography.bodyMd(
+                    color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
                   ),
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                  decoration: InputDecoration(
+                    hintText: 'Search...',
+                    hintStyle: AppTypography.bodyMd(
+                      color: isDark
+                          ? AppColors.darkOnSurfaceVariant
+                          : AppColors.onSurfaceVariant,
+                    ),
+                    prefixIcon: const Icon(
+                      Icons.search,
+                      size: AppSizes.iconMd,
+                      color: AppColors.outline,
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                  ),
                 ),
               ),
             ),
-            const SizedBox(width: AppSpacing.md),
+            const SizedBox(width: AppSpacing.sm),
           ],
 
           // Notification Bell
@@ -236,13 +251,14 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
             );
           }),
 
-          const SizedBox(width: AppSpacing.sm),
+          const SizedBox(width: AppSpacing.xs),
 
           // Profile Avatar & Role Info
           Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
               CircleAvatar(
-                radius: 18,
+                radius: 16,
                 backgroundColor: AppColors.primaryContainer,
                 backgroundImage: (userAvatarUrl != null && userAvatarUrl!.isNotEmpty)
                     ? NetworkImage(userAvatarUrl!)
@@ -254,28 +270,35 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                       )
                     : null,
               ),
-              if (!isMobile) ...[
-                const SizedBox(width: AppSpacing.sm),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      userName,
-                      style: AppTypography.bodyMd(
-                        color: isDark
-                            ? AppColors.darkOnSurface
-                            : AppColors.onSurface,
-                        fontWeight: FontWeight.w600,
+              if (!isMobile && screenWidth > 600) ...[
+                const SizedBox(width: AppSpacing.xs),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 120),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        userName,
+                        style: AppTypography.bodyMd(
+                          color: isDark
+                              ? AppColors.darkOnSurface
+                              : AppColors.onSurface,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                    Text(
-                      userRole,
-                      style: AppTypography.labelSm(
-                        color: AppColors.secondary,
+                      Text(
+                        userRole,
+                        style: AppTypography.labelSm(
+                          color: AppColors.secondary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ],

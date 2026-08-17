@@ -56,7 +56,7 @@ class AppSidebar extends StatelessWidget {
             decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
-                  color: Colors.white.withOpacity(0.1),
+                  color: Colors.white.withValues(alpha: 0.1),
                   width: 1,
                 ),
               ),
@@ -122,7 +122,7 @@ class AppSidebar extends StatelessWidget {
                         onTap: item.onTap ??
                             () {
                               if (item.route.isNotEmpty && item.route != currentRoute) {
-                                Get.toNamed(item.route);
+                                Get.offNamed(item.route);
                               }
                             },
                         child: AnimatedContainer(
@@ -207,7 +207,7 @@ class AppSidebar extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                       vertical: AppSpacing.sm + 4,
                     ),
-                    shape: RoundedRectangleBorder(
+                    shape: const RoundedRectangleBorder(
                       borderRadius: AppRadius.borderMd,
                     ),
                     elevation: 0,
@@ -222,7 +222,7 @@ class AppSidebar extends StatelessWidget {
             decoration: BoxDecoration(
               border: Border(
                 top: BorderSide(
-                  color: Colors.white.withOpacity(0.1),
+                  color: Colors.white.withValues(alpha: 0.1),
                   width: 1,
                 ),
               ),

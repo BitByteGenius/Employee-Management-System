@@ -40,7 +40,7 @@ class _NavigationList extends StatelessWidget {
         children: [
           ListTile(title: Text(title, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800))),
           Expanded(
-            child: ListView(children: items.map((item) => ListTile(leading: Icon(item.icon), title: Text(item.label), onTap: () => Get.toNamed(item.route))).toList()),
+            child: ListView(children: items.map((item) => ListTile(leading: Icon(item.icon), title: Text(item.label), onTap: () => Get.offNamed(item.route))).toList()),
           ),
           IconButton(
             tooltip: 'Toggle theme',
