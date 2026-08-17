@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:tms/core/constants/app_colors.dart';
 import 'package:tms/core/constants/app_sizes.dart';
 import 'package:tms/core/constants/app_typography.dart';
@@ -322,14 +324,10 @@ class SuperAdminSidebar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          CircleAvatar(
-            radius: 18,
-            backgroundColor: AppColors.primaryContainer,
-            child: Icon(
-              Icons.person,
-              size: 20,
-              color: AppColors.onPrimaryContainer,
-            ),
+          Icon(
+            Icons.logout_outlined,
+            size: 20,
+            color: AppColors.onPrimaryContainer,
           ),
 
           const SizedBox(width: AppSpacing.sm),
@@ -338,27 +336,24 @@ class SuperAdminSidebar extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Super Admin',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTypography.bodyMd(
-                    color: isDark
-                        ? AppColors.darkOnSurface
-                        : AppColors.primary,
-                    fontWeight: FontWeight.w600,
+                InkWell(
+                  onTap: () {
+                    Get.offAllNamed(AppRoutes.login);
+                  },
+                  child: Text(
+                    'Log Out',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTypography.bodyMd(
+                      color: isDark
+                          ? AppColors.darkOnSurface
+                          : AppColors.primary,
+                      fontWeight: FontWeight.w600,
+                      
+                    ),
                   ),
                 ),
-                Text(
-                  'Administrator',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTypography.labelSm(
-                    color: isDark
-                        ? AppColors.darkOnSurfaceVariant
-                        : AppColors.onSurfaceVariant,
-                  ),
-                ),
+                
               ],
             ),
           ),

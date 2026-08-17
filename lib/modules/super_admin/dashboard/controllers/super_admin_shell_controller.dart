@@ -9,6 +9,7 @@ class SuperAdminShellController extends GetxController {
   final routes = <String>[
     AppRoutes.superAdminDashboard,
     AppRoutes.accessControl,
+    AppRoutes.superAdminProject,
   ];
 
 //   final routes = <String>[

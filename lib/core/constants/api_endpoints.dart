@@ -28,6 +28,7 @@ class ApiEndpoints {
   static String activateUser(String id) => '/users/$id/activate';
   static String deactivateUser(String id) => '/users/$id/deactivate';
   static String updateUserRole(String id) => '/users/$id/role';
+  static String deleteUser(String id) => '/users/$id';
 
   // Modules
   static const String departments = '/departments';

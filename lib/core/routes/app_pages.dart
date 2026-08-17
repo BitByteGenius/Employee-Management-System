@@ -10,10 +10,9 @@ import 'package:tms/modules/splash/bindings/splash_binding.dart';
 import 'package:tms/modules/splash/views/splash_view.dart';
 import 'package:tms/modules/super_admin/acces%20controll/bindings/access_control_binding.dart';
 import 'package:tms/modules/super_admin/dashboard/bindings/super_admin_dashboard_binding.dart';
-import 'package:tms/modules/super_admin/projects/blindings/project_blindings.dart';
 
 import 'package:tms/modules/super_admin/dashboard/views/super_admin_shell_view.dart';
-import 'package:tms/modules/super_admin/projects/view/projects_overview_screen.dart';
+import 'package:tms/modules/super_admin/projects/blindings/project_blindings.dart';
 
 part 'app_routes.dart';
 

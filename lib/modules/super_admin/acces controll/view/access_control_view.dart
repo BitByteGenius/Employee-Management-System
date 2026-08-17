@@ -4,9 +4,12 @@ import 'package:get/get.dart';
 import 'package:tms/core/constants/app_colors.dart';
 import 'package:tms/core/constants/app_sizes.dart';
 import 'package:tms/core/constants/app_typography.dart';
+import 'package:tms/core/utils/app_date_formatter.dart';
 import 'package:tms/modules/super_admin/acces%20controll/controller/access_control_controller.dart';
+import 'package:tms/modules/super_admin/acces%20controll/models/access_control_pending_user.dart';
 import 'package:tms/modules/super_admin/acces%20controll/view/widget/access_control_cards.dart';
 import 'package:tms/modules/super_admin/acces%20controll/view/widget/pending_approval_table.dart';
+import 'package:tms/shared/widgets/app_state_widgets.dart';
 import 'package:tms/shared/widgets/app_top_bar.dart';
 
 class AccessControlView
@@ -203,72 +206,9 @@ class _ContentLayout
 
     if (controller.selectedTab.value ==
         1) {
-      return Container(
-        width: double.infinity,
-
-        padding:
-            const EdgeInsets.all(
-          AppSpacing.xl,
-        ),
-
-        decoration:
-            BoxDecoration(
-          color: isDark
-              ? AppColors.darkSurface
-              : AppColors
-                  .surfaceContainerLowest,
-
-          borderRadius:
-              AppRadius.borderMd,
-
-          border: Border.all(
-            color:
-                AppColors
-                    .outlineVariant,
-          ),
-        ),
-
-        child: Column(
-          children: [
-            const Icon(
-              Icons.delete_outline,
-              color:
-                  AppColors.outline,
-              size:
-                  AppSizes.iconXl,
-            ),
-
-            const SizedBox(
-              height:
-                  AppSpacing.md,
-            ),
-
-            Text(
-              'No deleted registrations',
-              style:
-                  AppTypography
-                      .titleLg(),
-            ),
-
-            const SizedBox(
-              height:
-                  AppSpacing.xs,
-            ),
-
-            Text(
-              'Rejected or removed user requests will be managed through existing user administration tools.',
-              style:
-                  AppTypography
-                      .bodyMd(
-                color:
-                    AppColors
-                        .onSurfaceVariant,
-              ),
-              textAlign:
-                  TextAlign.center,
-            ),
-          ],
-        ),
+      return _DeleteUsersTable(
+        controller: controller,
+        isDark: isDark,
       );
     }
 
@@ -358,6 +298,255 @@ class _ContentLayout
           child: side,
         ),
       ],
+    );
+  }
+}
+
+class _DeleteUsersTable extends StatelessWidget {
+  const _DeleteUsersTable({
+    required this.controller,
+    required this.isDark,
+  });
+
+  final AccessControlController controller;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: isDark
+            ? AppColors.darkSurface
+            : AppColors.surfaceContainerLowest,
+        borderRadius: AppRadius.borderMd,
+        border: Border.all(color: AppColors.outlineVariant),
+      ),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Users & Admins',
+                    style: AppTypography.titleLg(),
+                  ),
+                ),
+                IconButton(
+                  tooltip: 'Refresh',
+                  onPressed: () => controller.fetchDeleteUsers(refresh: true),
+                  icon: const Icon(Icons.refresh),
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1),
+          if (controller.isDeleteLoading.value)
+            const Padding(
+              padding: EdgeInsets.all(AppSpacing.md),
+              child: AppLoadingSkeleton(height: 220),
+            )
+          else if (controller.deleteErrorMessage.value.isNotEmpty)
+            AppErrorStateWidget(
+              errorMessage: controller.deleteErrorMessage.value,
+              onRetry: controller.fetchDeleteUsers,
+            )
+          else if (controller.deleteUsers.isEmpty)
+            const AppEmptyStateWidget(
+              title: 'No users or admins found',
+              description: 'Employee and admin accounts will appear here.',
+              icon: Icons.delete_outline,
+            )
+          else
+            Column(
+              children: controller.deleteUsers
+                  .map(
+                    (user) => _DeleteUserRow(
+                      user: user,
+                      controller: controller,
+                    ),
+                  )
+                  .toList(),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DeleteUserRow extends StatelessWidget {
+  const _DeleteUserRow({
+    required this.user,
+    required this.controller,
+  });
+
+  final AccessControlPendingUser user;
+  final AccessControlController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final isMobile = AppBreakpoints.isMobile(MediaQuery.sizeOf(context).width);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.06)
+                : AppColors.surfaceVariant,
+          ),
+        ),
+      ),
+      child: isMobile
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _DeleteUserIdentity(user: user),
+                const SizedBox(height: AppSpacing.sm),
+                Wrap(
+                  spacing: AppSpacing.sm,
+                  runSpacing: AppSpacing.sm,
+                  children: [
+                    _DeleteRoleBadge(role: user.role),
+                    Text(
+                      AppDateFormatter.tableDate(user.createdAt),
+                      style: AppTypography.bodyMd(),
+                    ),
+                    _DeleteButton(user: user, controller: controller),
+                  ],
+                ),
+              ],
+            )
+          : Row(
+              children: [
+                Expanded(
+                  flex: 4,
+                  child: _DeleteUserIdentity(user: user),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: _DeleteRoleBadge(role: user.role),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    AppDateFormatter.tableDate(user.createdAt),
+                    style: AppTypography.bodyMd(),
+                  ),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: _DeleteButton(user: user, controller: controller),
+                ),
+              ],
+            ),
+    );
+  }
+}
+
+class _DeleteUserIdentity extends StatelessWidget {
+  const _DeleteUserIdentity({required this.user});
+
+  final AccessControlPendingUser user;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        CircleAvatar(
+          radius: 18,
+          backgroundColor: AppColors.error,
+          child: Text(
+            user.initials,
+            style: AppTypography.labelMd(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.sm),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                user.fullName,
+                style: AppTypography.bodyMd(fontWeight: FontWeight.w600),
+                overflow: TextOverflow.ellipsis,
+              ),
+              Text(
+                user.email,
+                style: AppTypography.labelSm(
+                  color: AppColors.onSurfaceVariant,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DeleteRoleBadge extends StatelessWidget {
+  const _DeleteRoleBadge({required this.role});
+
+  final String role;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.sm,
+          vertical: 3,
+        ),
+        decoration: const BoxDecoration(
+          color: AppColors.surfaceContainerLow,
+          borderRadius: AppRadius.borderSm,
+        ),
+        child: Text(
+          role.toUpperCase(),
+          style: AppTypography.labelSm(color: AppColors.onSurfaceVariant),
+        ),
+      ),
+    );
+  }
+}
+
+class _DeleteButton extends StatelessWidget {
+  const _DeleteButton({
+    required this.user,
+    required this.controller,
+  });
+
+  final AccessControlPendingUser user;
+  final AccessControlController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(
+      () => OutlinedButton.icon(
+        onPressed: controller.isActionLoading.value
+            ? null
+            : () => controller.deleteUser(user),
+        icon: const Icon(Icons.delete_outline, size: AppSizes.iconSm),
+        label: const Text('Delete'),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppColors.error,
+          side: const BorderSide(color: AppColors.error),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.sm,
+            vertical: AppSpacing.xs,
+          ),
+        ),
+      ),
     );
   }
 }

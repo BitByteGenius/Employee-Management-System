@@ -15,7 +15,7 @@ abstract class AppRoutes {
   static const String accessControl = '/super-admin/access-control';
   
   // ✅ FIXED: Added leading slash '/'
-  static const String superAdminProject = '/super-admin/ProjectsOverviewScreen'; 
+static const String superAdminProject = '/super-admin/projects';
   
   static const String adminDashboard = '/admin/dashboard';
   static const String employeeDashboard = '/employee/dashboard';

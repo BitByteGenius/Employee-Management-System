@@ -272,11 +272,14 @@ import 'package:tms/modules/super_admin/acces%20controll/models/access_control_p
 
 class AccessControlController extends GetxController {
   final isLoading = false.obs;
+  final isDeleteLoading = false.obs;
   final isRefreshing = false.obs;
   final isActionLoading = false.obs;
   final errorMessage = ''.obs;
+  final deleteErrorMessage = ''.obs;
 
   final pendingUsers = <AccessControlPendingUser>[].obs;
+  final deleteUsers = <AccessControlPendingUser>[].obs;
   final departments = <Map<String, dynamic>>[].obs;
   final roles = <Map<String, dynamic>>[].obs;
 
@@ -291,6 +294,7 @@ class AccessControlController extends GetxController {
   final pageSize = 10.obs;
 
   final totalPending = 0.obs;
+  final totalDeleteUsers = 0.obs;
   final summaryAdmins = 0.obs;
   final summaryEmployees = 0.obs;
 
@@ -324,6 +328,7 @@ class AccessControlController extends GetxController {
     super.onInit();
 
     fetchPendingUsers();
+    fetchDeleteUsers();
     fetchDepartments();
     fetchRoles();
   }
@@ -362,15 +367,7 @@ class AccessControlController extends GetxController {
       );
 
       if (response.data?['success'] == true) {
-        final rawData = response.data['data'];
-
-        final list = (rawData as List? ?? [])
-            .whereType<Map>()
-            .map(
-              (item) => AccessControlPendingUser.fromJson(
-                Map<String, dynamic>.from(item),
-              ),
-            )
+        final list = _parseUsers(response.data['data'])
             .where(
               (user) =>
                   roleFilter.value.isEmpty ||
@@ -402,6 +399,48 @@ class AccessControlController extends GetxController {
     }
   }
 
+  Future<void> fetchDeleteUsers({bool refresh = false}) async {
+    if (refresh) {
+      isRefreshing.value = true;
+    } else {
+      isDeleteLoading.value = true;
+    }
+
+    deleteErrorMessage.value = '';
+
+    try {
+      final response = await _api.dio.get(
+        ApiEndpoints.users,
+        queryParameters: {
+          'deleted': 'all',
+          'page': 1,
+          'limit': 100,
+          'sortBy': 'createdAt',
+          'sortOrder': 'desc',
+        },
+      );
+
+      if (response.data?['success'] == true) {
+        final list = _parseUsers(response.data['data'])
+            .where((user) => user.isAdmin || user.isEmployee)
+            .toList();
+        deleteUsers.assignAll(list);
+
+        final meta = response.data['meta'];
+        totalDeleteUsers.value = meta is Map
+            ? (_toInt(meta['total']) ?? list.length)
+            : list.length;
+      } else {
+        deleteErrorMessage.value = 'Unable to load users.';
+      }
+    } catch (e) {
+      deleteErrorMessage.value = _friendlyError(e);
+    } finally {
+      isDeleteLoading.value = false;
+      isRefreshing.value = false;
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // Queue Summary
   // ---------------------------------------------------------------------------
@@ -420,16 +459,7 @@ class AccessControlController extends GetxController {
       );
 
       if (response.data?['success'] == true) {
-        final rawData = response.data['data'];
-
-        final list = (rawData as List? ?? [])
-            .whereType<Map>()
-            .map(
-              (item) => AccessControlPendingUser.fromJson(
-                Map<String, dynamic>.from(item),
-              ),
-            )
-            .toList();
+        final list = _parseUsers(response.data['data']);
 
         summaryAdmins.value =
             list.where((user) => user.isAdmin).length;
@@ -616,6 +646,22 @@ class AccessControlController extends GetxController {
     );
   }
 
+  Future<bool> deleteUser(
+    AccessControlPendingUser user,
+  ) async {
+    return _runUserAction(
+      successTitle: 'Deleted',
+      successMessage: '${user.fullName} has been deleted.',
+      request: () => _api.dio.delete(
+        ApiEndpoints.deleteUser(user.id),
+      ),
+      afterSuccess: () async {
+        await fetchDeleteUsers(refresh: true);
+        await fetchPendingUsers(refresh: true);
+      },
+    );
+  }
+
   // ---------------------------------------------------------------------------
   // Assign Department
   // ---------------------------------------------------------------------------
@@ -691,6 +737,7 @@ class AccessControlController extends GetxController {
     required String successTitle,
     required String successMessage,
     required Future<dio.Response<dynamic>> Function() request,
+    Future<void> Function()? afterSuccess,
   }) async {
     if (isActionLoading.value) {
       return false;
@@ -708,9 +755,16 @@ class AccessControlController extends GetxController {
           snackPosition: SnackPosition.TOP,
         );
 
-        await fetchPendingUsers(
-          refresh: true,
-        );
+        if (afterSuccess != null) {
+          await afterSuccess();
+        } else {
+          await fetchPendingUsers(
+            refresh: true,
+          );
+          await fetchDeleteUsers(
+            refresh: true,
+          );
+        }
 
         return true;
       }
@@ -802,5 +856,16 @@ class AccessControlController extends GetxController {
 
   String _escapeCsv(String value) {
     return value.replaceAll('"', '""');
+  }
+
+  List<AccessControlPendingUser> _parseUsers(dynamic rawData) {
+    return (rawData as List? ?? [])
+        .whereType<Map>()
+        .map(
+          (item) => AccessControlPendingUser.fromJson(
+            Map<String, dynamic>.from(item),
+          ),
+        )
+        .toList();
   }
 }
