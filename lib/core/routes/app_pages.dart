@@ -4,6 +4,7 @@ import 'package:tms/modules/admin/views/admin_dashboard_view.dart';
 import 'package:tms/modules/auth/bindings/auth_binding.dart';
 import 'package:tms/modules/auth/views/login_view.dart';
 import 'package:tms/modules/auth/views/register_view.dart';
+import 'package:tms/modules/department/bindings/department_binding.dart';
 import 'package:tms/modules/employee/bindings/employee_dashboard_binding.dart';
 import 'package:tms/modules/employee/views/employee_dashboard_view.dart';
 import 'package:tms/modules/splash/bindings/splash_binding.dart';
@@ -41,6 +42,14 @@ class AppPages {
       ),
       binding: SuperAdminDashboardBinding(),
     ),
+    
+    GetPage(
+      name: AppRoutes.departments,
+      page: () => const SuperAdminShellView(
+        initialRoute: AppRoutes.departments),
+      binding: DepartmentBinding()
+      ),
+
     GetPage(
       name: AppRoutes.accessControl,
       page: () => const SuperAdminShellView(
@@ -61,6 +70,7 @@ class AppPages {
       page: () => const AdminDashboardView(),
       binding: AdminDashboardBinding(),
     ),
+    
     GetPage(
       name: AppRoutes.employeeDashboard,
       page: () => const EmployeeDashboardView(),

@@ -334,11 +334,11 @@ class _DeleteUsersTable extends StatelessWidget {
                     style: AppTypography.titleLg(),
                   ),
                 ),
-                IconButton(
+                /*IconButton(
                   tooltip: 'Refresh',
                   onPressed: () => controller.fetchDeleteUsers(refresh: true),
                   icon: const Icon(Icons.refresh),
-                ),
+                ),*/
               ],
             ),
           ),

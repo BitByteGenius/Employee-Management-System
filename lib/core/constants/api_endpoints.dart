@@ -18,6 +18,27 @@ class ApiEndpoints {
   static const String logout = '/auth/logout';
   static const String me = '/auth/me';
 
+  // ==========================================================================
+  // DEPARTMENTS
+  // ==========================================================================
+
+  static const String departments = '/departments';
+
+  static String department(String id) =>
+      '$departments/$id';
+
+  static String departmentAdmin(String id) =>
+      '$departments/$id/admin';
+
+  static String departmentEmployees(String id) =>
+      '$departments/$id/employees';
+
+  static String departmentSettings(String id) =>
+      '$departments/$id/settings';
+
+  static String departmentReports(String id) =>
+      '$departments/$id/reports';
+
   // Users
   static const String users = '/users';
   static const String pendingUsers = '/users?status=pending';
@@ -31,7 +52,6 @@ class ApiEndpoints {
   static String deleteUser(String id) => '/users/$id';
 
   // Modules
-  static const String departments = '/departments';
   static const String projects = '/projects';
   static const String tasks = '/tasks';
   static const String roles = '/roles';

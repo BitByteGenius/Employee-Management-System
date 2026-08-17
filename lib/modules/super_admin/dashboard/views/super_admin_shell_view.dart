@@ -159,6 +159,7 @@ import 'package:get/get.dart';
 
 import 'package:tms/core/constants/app_sizes.dart';
 import 'package:tms/core/routes/app_pages.dart';
+import 'package:tms/modules/department/views/department_view.dart';
 import 'package:tms/modules/super_admin/dashboard/controllers/super_admin_shell_controller.dart';
 import 'package:tms/modules/super_admin/acces%20controll/view/access_control_view.dart';
 import 'package:tms/modules/super_admin/dashboard/views/super_admin_dashboard_view.dart';
@@ -174,15 +175,13 @@ class SuperAdminShellView extends StatefulWidget {
   final String initialRoute;
 
   @override
-  State<SuperAdminShellView> createState() =>
-      _SuperAdminShellViewState();
+  State<SuperAdminShellView> createState() => _SuperAdminShellViewState();
 }
 
 class _SuperAdminShellViewState extends State<SuperAdminShellView> {
   late final SuperAdminShellController controller;
 
-  final GlobalKey<ScaffoldState> scaffoldKey =
-      GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -216,12 +215,15 @@ class _SuperAdminShellViewState extends State<SuperAdminShellView> {
 
   int _getPageIndex(String route) {
     switch (route) {
+      case AppRoutes.superAdminDashboard:
+        return 0;
       case AppRoutes.accessControl:
         return 1;
-          case AppRoutes.superAdminProject:
-        return 2; // Index for Projects Overview
-      case AppRoutes.superAdminDashboard:
-        default:
+      case AppRoutes.departments:
+        return 2;
+      case AppRoutes.superAdminProject:
+        return 3;
+      default:
         return 0;
     }
   }
@@ -279,11 +281,18 @@ class _SuperAdminShellViewState extends State<SuperAdminShellView> {
                       onMenuPressed: !isDesktop ? _openMobileDrawer : null,
                     ),
 
+                    //====================================================
+                    // 2: Departments
+                    //====================================================
+                    DepartmentView(
+                      onMenuPressed: !isDesktop ? _openMobileDrawer : null,
+                    ),
+
                     // ==================================================
-                    // 2: Projects Overview
+                    // 3: Projects Overview
                     // ==================================================
                     ProjectsOverviewScreen(
-                       onMenuPressed: !isDesktop ? _openMobileDrawer : null,
+                      onMenuPressed: !isDesktop ? _openMobileDrawer : null,
                     ),
                   ],
                 );

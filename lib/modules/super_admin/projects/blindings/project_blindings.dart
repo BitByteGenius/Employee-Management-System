@@ -6,10 +6,15 @@ import 'package:tms/modules/super_admin/projects/services/deliverable_service.da
 class SuperAdminProjectBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<DeliverableService>(
-      () => DeliverableService(Get.find<ApiClient>()),
-    );
+    if (!Get.isRegistered<DeliverableService>()) {
+      Get.lazyPut<DeliverableService>(
+        () => DeliverableService(Get.find<ApiClient>()),
+        fenix: true,
+      );
+    }
 
-    Get.lazyPut<ProjectController>(() => ProjectController());
+    if (!Get.isRegistered<ProjectController>()) {
+      Get.lazyPut<ProjectController>(() => ProjectController(), fenix: true);
+    }
   }
 }
