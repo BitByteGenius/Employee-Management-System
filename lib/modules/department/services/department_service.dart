@@ -11,7 +11,7 @@ class DepartmentService {
   // GET DEPARTMENTS
   // ==========================================================================
 
-  Future<dynamic>getDepartments({
+  Future<dynamic> getDepartments({
     int page = 1,
     int limit = 20,
     String? search,
@@ -24,18 +24,10 @@ class DepartmentService {
       queryParameters: {
         'page': page,
         'limit': limit,
-        if (search != null &&
-            search.trim().isNotEmpty)
-          'search': search.trim(),
-        if (status != null &&
-            status.isNotEmpty)
-          'status': status,
-        if (sortBy != null &&
-            sortBy.isNotEmpty)
-          'sortBy': sortBy,
-        if (sortOrder != null &&
-            sortOrder.isNotEmpty)
-          'sortOrder': sortOrder,
+        if (search != null && search.trim().isNotEmpty) 'search': search.trim(),
+        if (status != null && status.isNotEmpty) 'status': status,
+        if (sortBy != null && sortBy.isNotEmpty) 'sortBy': sortBy,
+        if (sortOrder != null && sortOrder.isNotEmpty) 'sortOrder': sortOrder,
       },
     );
   }
@@ -44,21 +36,15 @@ class DepartmentService {
   // GET DEPARTMENT
   // ==========================================================================
 
-  Future<dynamic> getDepartment(
-    String id,
-  ) {
-    return apiClient.get(
-      ApiEndpoints.department(id),
-    );
+  Future<dynamic> getDepartment(String id) {
+    return apiClient.get(ApiEndpoints.department(id));
   }
 
   // ==========================================================================
   // CREATE
   // ==========================================================================
 
-  Future<dynamic> createDepartment(
-    CreateDepartmentRequest request,
-  ) {
+  Future<dynamic> createDepartment(CreateDepartmentRequest request) {
     return apiClient.post(
       ApiEndpoints.departments,
       data: request.toJson(),
@@ -69,10 +55,7 @@ class DepartmentService {
   // UPDATE
   // ==========================================================================
 
-  Future<dynamic> updateDepartment(
-    String id,
-    Map<String, dynamic> data,
-  ) {
+  Future<dynamic> updateDepartment(String id, Map<String, dynamic> data) {
     return apiClient.patch(
       ApiEndpoints.department(id),
       data: data,
@@ -83,26 +66,17 @@ class DepartmentService {
   // DELETE / DEACTIVATE
   // ==========================================================================
 
-  Future<dynamic> deleteDepartment(
-    String id,
-  ) {
-    return apiClient.delete(
-      ApiEndpoints.department(id),
-    );
+  Future<dynamic> deleteDepartment(String id) {
+    return apiClient.delete(ApiEndpoints.department(id));
   }
 
   // ==========================================================================
   // ASSIGN ADMIN
   // ==========================================================================
 
-  Future<dynamic> assignAdmin(
-    String departmentId,
-    String adminId,
-  ) {
+  Future<dynamic> assignAdmin(String departmentId, String adminId) {
     return apiClient.patch(
-      ApiEndpoints.departmentAdmin(
-        departmentId,
-      ),
+      ApiEndpoints.departmentAdmin(departmentId),
       data: {
         'adminId': adminId,
       },
@@ -113,13 +87,9 @@ class DepartmentService {
   // REMOVE ADMIN
   // ==========================================================================
 
-  Future<dynamic> removeAdmin(
-    String departmentId,
-  ) {
+  Future<dynamic> removeAdmin(String departmentId) {
     return apiClient.delete(
-      ApiEndpoints.departmentAdmin(
-        departmentId,
-      ),
+      ApiEndpoints.departmentAdmin(departmentId),
     );
   }
 
@@ -134,15 +104,24 @@ class DepartmentService {
     String? search,
   }) {
     return apiClient.get(
-      ApiEndpoints.departmentEmployees(
-        departmentId,
-      ),
+      ApiEndpoints.departmentEmployees(departmentId),
       queryParameters: {
         'page': page,
         'limit': limit,
-        if (search != null &&
-            search.trim().isNotEmpty)
-          'search': search.trim(),
+        if (search != null && search.trim().isNotEmpty) 'search': search.trim(),
+      },
+    );
+  }
+
+  // ==========================================================================
+  // USERS SEARCH (for Admin selection)
+  // ==========================================================================
+
+  Future<dynamic> searchUsers(String query) {
+    return apiClient.get(
+      '${ApiEndpoints.departments}/admin-candidates',
+      queryParameters: {
+        if (query.trim().isNotEmpty) 'search': query.trim(),
       },
     );
   }
@@ -151,13 +130,9 @@ class DepartmentService {
   // SETTINGS
   // ==========================================================================
 
-  Future<dynamic> getSettings(
-    String departmentId,
-  ) {
+  Future<dynamic> getSettings(String departmentId) {
     return apiClient.get(
-      ApiEndpoints.departmentSettings(
-        departmentId,
-      ),
+      ApiEndpoints.departmentSettings(departmentId),
     );
   }
 
@@ -166,9 +141,7 @@ class DepartmentService {
     Map<String, dynamic> data,
   ) {
     return apiClient.patch(
-      ApiEndpoints.departmentSettings(
-        departmentId,
-      ),
+      ApiEndpoints.departmentSettings(departmentId),
       data: data,
     );
   }
@@ -177,13 +150,9 @@ class DepartmentService {
   // REPORTS
   // ==========================================================================
 
-  Future<dynamic> getReports(
-    String departmentId,
-  ) {
+  Future<dynamic> getReports(String departmentId) {
     return apiClient.get(
-      ApiEndpoints.departmentReports(
-        departmentId,
-      ),
+      ApiEndpoints.departmentReports(departmentId),
     );
   }
 }

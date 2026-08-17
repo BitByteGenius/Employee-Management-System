@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:tms/core/constants/app_colors.dart';
 import 'package:tms/core/constants/app_sizes.dart';
 import 'package:tms/core/constants/app_typography.dart';
@@ -148,7 +147,7 @@ class SuperAdminSidebar extends StatelessWidget {
           Container(
             width: 42,
             height: 42,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColors.primary,
               borderRadius: AppRadius.borderMd,
             ),
@@ -290,7 +289,7 @@ class SuperAdminSidebar extends StatelessWidget {
                   Container(
                     width: 4,
                     height: 22,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: AppColors.secondary,
                       borderRadius: AppRadius.borderFull,
                     ),
@@ -324,7 +323,7 @@ class SuperAdminSidebar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(
+          const Icon(
             Icons.logout_outlined,
             size: 20,
             color: AppColors.onPrimaryContainer,

@@ -8,45 +8,45 @@ import 'package:tms/modules/super_admin/acces%20controll/controller/access_contr
 import 'package:tms/modules/super_admin/dashboard/controllers/super_admin_dashboard_controller.dart';
 import 'package:tms/modules/super_admin/dashboard/controllers/super_admin_shell_controller.dart';
 import 'package:tms/modules/super_admin/projects/controller/project_controller.dart';
+import 'package:tms/modules/super_admin/projects/repositories/project_repository.dart';
 import 'package:tms/modules/super_admin/projects/services/deliverable_service.dart';
+import 'package:tms/modules/super_admin/projects/services/project_service.dart';
 
 class SuperAdminDashboardBinding extends Bindings {
   @override
   void dependencies() {
     // ------------------------------------------------------------
     // Shell Controller
-    // Handles:
-    // - Current route
-    // - Current index
-    // - Sidebar navigation
     // ------------------------------------------------------------
-    Get.lazyPut<SuperAdminShellController>(
-      () => SuperAdminShellController(),
-      fenix: true,
-    );
+    if (!Get.isRegistered<SuperAdminShellController>()) {
+      Get.lazyPut<SuperAdminShellController>(
+        () => SuperAdminShellController(),
+        fenix: true,
+      );
+    }
 
     // ------------------------------------------------------------
     // Dashboard Controller
-    // Handles dashboard data and dashboard actions
     // ------------------------------------------------------------
-    Get.lazyPut<SuperAdminDashboardController>(
-      () => SuperAdminDashboardController(),
-      fenix: true,
-    );
+    if (!Get.isRegistered<SuperAdminDashboardController>()) {
+      Get.lazyPut<SuperAdminDashboardController>(
+        () => SuperAdminDashboardController(),
+        fenix: true,
+      );
+    }
 
     // ------------------------------------------------------------
     // Access Control Controller
-    // Handles pending users, approvals, tabs, pagination, etc.
     // ------------------------------------------------------------
-    Get.lazyPut<AccessControlController>(
-      () => AccessControlController(),
-      fenix: true,
-    );
+    if (!Get.isRegistered<AccessControlController>()) {
+      Get.lazyPut<AccessControlController>(
+        () => AccessControlController(),
+        fenix: true,
+      );
+    }
 
     // ------------------------------------------------------------
     // Department dependencies
-    // Required because SuperAdminShellView renders DepartmentView
-    // in an IndexedStack, which is built eagerly for all routes.
     // ------------------------------------------------------------
     if (!Get.isRegistered<DepartmentService>()) {
       Get.lazyPut<DepartmentService>(
@@ -71,11 +71,6 @@ class SuperAdminDashboardBinding extends Bindings {
 
     // ------------------------------------------------------------
     // Project dependencies
-    // Required because SuperAdminShellView renders
-    // ProjectsOverviewScreen (GetView<ProjectController>) in an
-    // IndexedStack, which is built eagerly for all routes.
-    // DeliverableService must be registered before ProjectController
-    // because ProjectController resolves it at field-initializer time.
     // ------------------------------------------------------------
     if (!Get.isRegistered<DeliverableService>()) {
       Get.lazyPut<DeliverableService>(
@@ -84,9 +79,26 @@ class SuperAdminDashboardBinding extends Bindings {
       );
     }
 
+    if (!Get.isRegistered<ProjectService>()) {
+      Get.lazyPut<ProjectService>(
+        () => ProjectService(Get.find<ApiClient>()),
+        fenix: true,
+      );
+    }
+
+    if (!Get.isRegistered<ProjectRepository>()) {
+      Get.lazyPut<ProjectRepository>(
+        () => ProjectRepository(Get.find<ProjectService>()),
+        fenix: true,
+      );
+    }
+
     if (!Get.isRegistered<ProjectController>()) {
       Get.lazyPut<ProjectController>(
-        () => ProjectController(),
+        () => ProjectController(
+          repository: Get.find<ProjectRepository>(),
+          deliverableService: Get.find<DeliverableService>(),
+        ),
         fenix: true,
       );
     }

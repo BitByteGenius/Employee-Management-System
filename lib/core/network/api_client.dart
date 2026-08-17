@@ -71,6 +71,7 @@
 //   }
 // }
 
+import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 
 import '../constants/api_endpoints.dart';
@@ -119,6 +120,12 @@ class ApiClient {
 
       if (token != null && token.isNotEmpty) {
         options.headers['Authorization'] = 'Bearer $token';
+      }
+
+      if (kDebugMode) {
+        debugPrint(
+          '[API ${options.method}] ${options.path} | Auth: ${token != null && token.isNotEmpty}',
+        );
       }
 
       handler.next(options);

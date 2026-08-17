@@ -200,10 +200,10 @@ class SuperAdminDashboardView
 
       childAspectRatio:
           crossAxisCount == 1
-              ? 2.5
+              ? 2.8
               : crossAxisCount == 3
-                  ? 1.6
-                  : 1.35,
+                  ? 1.55
+                  : 1.15,
 
       shrinkWrap: true,
 

@@ -172,13 +172,11 @@ class DepartmentRepository {
   // EMPLOYEES
   // ==========================================================================
 
-  Future<List<DepartmentEmployeeModel>>
-      getEmployees(
+  Future<List<DepartmentEmployeeModel>> getEmployees(
     String departmentId, {
     String? search,
   }) async {
-    final response =
-        await service.getEmployees(
+    final response = await service.getEmployees(
       departmentId,
       search: search,
     );
@@ -198,12 +196,37 @@ class DepartmentRepository {
     return raw
         .whereType<Map>()
         .map(
-          (item) =>
-              DepartmentEmployeeModel.fromJson(
+          (item) => DepartmentEmployeeModel.fromJson(
             Map<String, dynamic>.from(item),
           ),
         )
         .toList();
+  }
+
+  // ==========================================================================
+  // SEARCH USERS
+  // ==========================================================================
+
+  Future<List<DepartmentEmployeeModel>> searchUsers(String query) async {
+    try {
+      final response = await service.searchUsers(query);
+      if (response is List) {
+        return response
+            .whereType<Map>()
+            .map((item) => DepartmentEmployeeModel.fromJson(Map<String, dynamic>.from(item)))
+            .toList();
+      }
+      final json = _map(response);
+      final raw = json['data'] ?? json['users'] ?? json['items'] ?? [];
+
+      if (raw is List) {
+        return raw
+            .whereType<Map>()
+            .map((item) => DepartmentEmployeeModel.fromJson(Map<String, dynamic>.from(item)))
+            .toList();
+      }
+    } catch (_) {}
+    return [];
   }
 
   // ==========================================================================

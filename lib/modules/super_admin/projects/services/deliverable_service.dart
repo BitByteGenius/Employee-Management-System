@@ -1,28 +1,9 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:tms/core/constants/api_endpoints.dart';
 import 'package:tms/core/network/api_client.dart';
-
-class DeliverableModel {
-  final String? filePath;
-  final String? externalLink;
-  final DateTime? submissionDeadline;
-  final String? notes;
-
-  DeliverableModel({
-    this.filePath,
-    this.externalLink,
-    this.submissionDeadline,
-    this.notes,
-  });
-
-  Map<String, dynamic> toJson() => {
-        'filePath': filePath,
-        'externalLink': externalLink,
-        'submissionDeadline': submissionDeadline?.toIso8601String(),
-        'notes': notes,
-      };
-}
+import 'package:tms/modules/super_admin/projects/models/dilevariable_models.dart';
 
 class DeliverableService {
   final ApiClient _apiClient;
@@ -37,7 +18,7 @@ class DeliverableService {
   }) async {
     try {
       // 1. Construct FormData for multipart request
-      FormData formData = FormData.fromMap({
+      final formData = FormData.fromMap({
         if (deliverable.externalLink != null && deliverable.externalLink!.isNotEmpty)
           'externalLink': deliverable.externalLink,
         if (deliverable.submissionDeadline != null)
@@ -49,12 +30,11 @@ class DeliverableService {
         if (file != null)
           'file': await MultipartFile.fromFile(
             file.path,
-            filename: file.path.split('/').last,
+            filename: file.path.split('/').last.split('\\').last,
           ),
       });
 
       // 3. Make POST request using ApiClient's configured dio instance
-      // Note: We explicitly override Content-Type header to multipart/form-data for this request
       final response = await _apiClient.dio.post(
         ApiEndpoints.projectDeliverables(projectId),
         data: formData,
@@ -70,7 +50,7 @@ class DeliverableService {
       }
       return false;
     } catch (e) {
-      print('Error submitting deliverable: $e');
+      debugPrint('Error submitting deliverable: $e');
       return false;
     }
   }
