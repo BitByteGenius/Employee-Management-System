@@ -194,8 +194,7 @@ class ProjectController extends GetxController {
         }
       }
 
-      projects.insert(0, newProj);
-      totalProjects.value++;
+      await fetchProjects(refresh: true);
 
       Get.snackbar(
         'Success',

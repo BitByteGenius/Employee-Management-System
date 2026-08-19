@@ -1,5 +1,7 @@
 class DeliverableModel {
   final String? filePath;
+  final String? fileUrl;
+  final String? fileName;
   final String? externalLink;
   final DateTime? submissionDeadline;
   final String? notes;
@@ -7,6 +9,8 @@ class DeliverableModel {
 
   DeliverableModel({
     this.filePath,
+    this.fileUrl,
+    this.fileName,
     this.externalLink,
     this.submissionDeadline,
     this.notes,
@@ -15,7 +19,9 @@ class DeliverableModel {
 
   factory DeliverableModel.fromJson(Map<String, dynamic> json) {
     return DeliverableModel(
-      filePath: json['filePath']?.toString(),
+      filePath: (json['filePath'] ?? json['fileUrl'] ?? json['path'])?.toString(),
+      fileUrl: json['fileUrl']?.toString(),
+      fileName: (json['fileName'] ?? json['name'] ?? json['originalName'])?.toString(),
       externalLink: json['externalLink']?.toString(),
       submissionDeadline: json['submissionDate'] != null
           ? DateTime.tryParse(json['submissionDate'].toString())
@@ -31,6 +37,8 @@ class DeliverableModel {
 
   Map<String, dynamic> toJson() => {
     'filePath': filePath,
+    'fileUrl': fileUrl,
+    'fileName': fileName,
     'externalLink': externalLink,
     'submissionDeadline': submissionDeadline?.toIso8601String(),
     'notes': notes,

@@ -283,6 +283,10 @@ class ProjectsOverviewScreen extends GetView<ProjectController> {
                   ),
                 ),
               ],
+              if (project.hasFileAttachment) ...[
+                const SizedBox(width: AppSpacing.sm),
+                _buildAttachmentPill(context, project, isDark),
+              ],
               const Spacer(),
               PopupMenuButton<String>(
                 icon: const Icon(Icons.more_vert, color: AppColors.onSurfaceVariant),
@@ -368,6 +372,303 @@ class ProjectsOverviewScreen extends GetView<ProjectController> {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildAttachmentPill(BuildContext context, ProjectModel project, bool isDark) {
+    final deliverable = project.primaryDeliverable;
+    final isLink = deliverable?.externalLink != null && deliverable!.externalLink!.isNotEmpty;
+    final rawName = deliverable?.fileName ??
+        (deliverable?.filePath != null
+            ? deliverable!.filePath!.split('/').last.split('\\').last
+            : (isLink ? 'Link' : 'File'));
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(AppRadius.full),
+      onTap: () => _showAttachmentDialog(context, project, deliverable),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.darkSurfaceContainer : AppColors.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(AppRadius.full),
+          border: Border.all(color: AppColors.secondary.withValues(alpha: 0.5)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              isLink ? Icons.link : Icons.attach_file,
+              size: 12,
+              color: AppColors.secondary,
+            ),
+            const SizedBox(width: 4),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 80),
+              child: Text(
+                rawName,
+                style: AppTypography.labelSm(
+                  color: AppColors.secondary,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showAttachmentDialog(BuildContext context, ProjectModel project, dynamic deliverable) {
+    if (deliverable == null) return;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final file = deliverable.fileName ?? deliverable.filePath?.split('/').last.split('\\').last ?? 'Attachment';
+    final link = deliverable.externalLink;
+    final path = deliverable.filePath ?? deliverable.fileUrl;
+    final notes = deliverable.notes;
+
+    final isImage = path != null &&
+        (path.toLowerCase().endsWith('.png') ||
+            path.toLowerCase().endsWith('.jpg') ||
+            path.toLowerCase().endsWith('.jpeg') ||
+            path.toLowerCase().endsWith('.webp') ||
+            path.toLowerCase().endsWith('.gif') ||
+            path.contains('/image/upload/'));
+
+    Get.dialog(
+      Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+        backgroundColor: isDark ? AppColors.darkSurface : AppColors.surfaceContainerLowest,
+        child: Container(
+          width: 480,
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Project Attachment',
+                      style: AppTypography.headlineSm(
+                        color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        Icons.close,
+                        size: AppSizes.iconSm,
+                        color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                      ),
+                      onPressed: () => Get.back(),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  'Project: ${project.name}',
+                  style: AppTypography.bodyMd(
+                    color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Divider(
+                  color: isDark ? Colors.white.withValues(alpha: 0.1) : AppColors.outlineVariant,
+                  height: 1,
+                ),
+                const SizedBox(height: AppSpacing.lg),
+
+                // File Preview Area
+                if (path != null && path.isNotEmpty) ...[
+                  if (isImage) ...[
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
+                      child: Container(
+                        constraints: const BoxConstraints(maxHeight: 280, minHeight: 140),
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: isDark ? AppColors.darkSurfaceContainer : AppColors.surfaceContainerLow,
+                          borderRadius: BorderRadius.circular(AppRadius.sm),
+                          border: Border.all(
+                            color: isDark ? Colors.white.withValues(alpha: 0.1) : AppColors.outlineVariant,
+                          ),
+                        ),
+                        child: Image.network(
+                          path,
+                          fit: BoxFit.contain,
+                          loadingBuilder: (context, child, progress) {
+                            if (progress == null) return child;
+                            return const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(AppSpacing.lg),
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              ),
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) => Container(
+                            padding: const EdgeInsets.all(AppSpacing.xl),
+                            alignment: Alignment.center,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.broken_image_outlined, size: 40, color: AppColors.outline),
+                                const SizedBox(height: AppSpacing.xs),
+                                Text(
+                                  'Unable to load preview',
+                                  style: AppTypography.labelSm(color: AppColors.outline),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Row(
+                      children: [
+                        const Icon(Icons.image_outlined, size: 16, color: AppColors.secondary),
+                        const SizedBox(width: AppSpacing.xs),
+                        Expanded(
+                          child: Text(
+                            file,
+                            style: AppTypography.bodyMd(
+                              color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ] else ...[
+                    Container(
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      decoration: BoxDecoration(
+                        color: isDark ? AppColors.darkSurfaceContainer : AppColors.surfaceContainerLow,
+                        borderRadius: BorderRadius.circular(AppRadius.sm),
+                        border: Border.all(
+                          color: isDark ? Colors.white.withValues(alpha: 0.1) : AppColors.outlineVariant,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: AppColors.secondary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(AppRadius.sm),
+                            ),
+                            child: Icon(
+                              path.toLowerCase().endsWith('.pdf')
+                                  ? Icons.picture_as_pdf_outlined
+                                  : Icons.insert_drive_file_outlined,
+                              color: AppColors.secondary,
+                              size: 26,
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.md),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  file,
+                                  style: AppTypography.bodyMd(
+                                    color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'Attached Document',
+                                  style: AppTypography.labelSm(
+                                    color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+
+                // External Link (if any)
+                if (link != null && link.isNotEmpty) ...[
+                  const SizedBox(height: AppSpacing.md),
+                  Container(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    decoration: BoxDecoration(
+                      color: isDark ? AppColors.darkSurfaceContainer : AppColors.surfaceContainerLow,
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
+                      border: Border.all(
+                        color: isDark ? Colors.white.withValues(alpha: 0.1) : AppColors.outlineVariant,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.link, color: AppColors.secondary, size: 20),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'External Link',
+                                style: AppTypography.labelSm(
+                                  color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                                ),
+                              ),
+                              SelectableText(
+                                link,
+                                style: AppTypography.bodyMd(
+                                  color: AppColors.secondary,
+                                ).copyWith(decoration: TextDecoration.underline),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+
+                // Notes
+                if (notes != null && notes.isNotEmpty) ...[
+                  const SizedBox(height: AppSpacing.md),
+                  Text(
+                    'Notes:',
+                    style: AppTypography.labelSm(
+                      color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                    ).copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 4),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    decoration: BoxDecoration(
+                      color: isDark ? AppColors.darkSurfaceContainer : AppColors.surfaceContainerLow,
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
+                    ),
+                    child: Text(
+                      notes,
+                      style: AppTypography.bodyMd(
+                        color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
