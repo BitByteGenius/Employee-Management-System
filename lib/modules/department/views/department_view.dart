@@ -311,9 +311,16 @@ class _ContentLayout extends StatelessWidget {
                                           children: [
                                             CircleAvatar(
                                               radius: 12,
-                                              backgroundImage: dept.admin?.profilePicture != null
+                                              backgroundColor: AppColors.primaryContainer,
+                                              backgroundImage: dept.admin?.profilePicture != null && dept.admin!.profilePicture!.isNotEmpty
                                                   ? NetworkImage(dept.admin!.profilePicture!)
-                                                  : const NetworkImage('https://i.pravatar.cc/150?img=32'),
+                                                  : null,
+                                              child: (dept.admin?.profilePicture == null || dept.admin!.profilePicture!.isEmpty)
+                                                  ? Text(
+                                                      dept.admin!.name.isNotEmpty ? dept.admin!.name[0].toUpperCase() : 'A',
+                                                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.onPrimaryContainer),
+                                                    )
+                                                  : null,
                                             ),
                                             const SizedBox(width: AppSpacing.xs),
                                             Expanded(
@@ -583,9 +590,16 @@ class _ContentLayout extends StatelessWidget {
                                 return ListTile(
                                   contentPadding: EdgeInsets.zero,
                                   leading: CircleAvatar(
-                                    backgroundImage: emp.profilePicture != null
+                                    backgroundColor: AppColors.primaryContainer,
+                                    backgroundImage: emp.profilePicture != null && emp.profilePicture!.isNotEmpty
                                         ? NetworkImage(emp.profilePicture!)
-                                        : const NetworkImage('https://i.pravatar.cc/150?img=12'),
+                                        : null,
+                                    child: (emp.profilePicture == null || emp.profilePicture!.isEmpty)
+                                        ? Text(
+                                            emp.name.isNotEmpty ? emp.name[0].toUpperCase() : 'E',
+                                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.onPrimaryContainer),
+                                          )
+                                        : null,
                                   ),
                                   title: Text(emp.name, style: AppTypography.titleLg(color: AppColors.onSurface)),
                                   subtitle: Text(
@@ -672,9 +686,16 @@ class _ContentLayout extends StatelessWidget {
                           return ListTile(
                             leading: CircleAvatar(
                               radius: 14,
-                              backgroundImage: cand.profilePicture != null
+                              backgroundColor: AppColors.primaryContainer,
+                              backgroundImage: cand.profilePicture != null && cand.profilePicture!.isNotEmpty
                                   ? NetworkImage(cand.profilePicture!)
-                                  : const NetworkImage('https://i.pravatar.cc/150?img=32'),
+                                  : null,
+                              child: (cand.profilePicture == null || cand.profilePicture!.isEmpty)
+                                  ? Text(
+                                      cand.name.isNotEmpty ? cand.name[0].toUpperCase() : 'U',
+                                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.onPrimaryContainer),
+                                    )
+                                  : null,
                             ),
                             title: Text(cand.name, style: AppTypography.titleLg(color: AppColors.onSurface)),
                             subtitle: Text(cand.email, style: AppTypography.labelSm(color: AppColors.outline)),

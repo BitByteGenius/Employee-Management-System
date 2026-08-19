@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:tms/core/constants/app_colors.dart';
 import 'package:tms/core/constants/app_constants.dart' hide AppColors, AppRadius;
 import 'package:tms/core/constants/app_sizes.dart';
 import 'package:tms/core/constants/app_typography.dart';
 import 'package:tms/modules/super_admin/projects/controller/project_controller.dart';
 import 'package:tms/modules/super_admin/projects/models/project_model.dart';
-import 'package:tms/modules/super_admin/projects/view/widget/project_deliverables_dialog.dart';
+import 'package:tms/modules/super_admin/projects/view/widget/create_project_dialog.dart';
 import 'package:tms/shared/widgets/app_top_bar.dart';
 
 class ProjectsOverviewScreen extends GetView<ProjectController> {
@@ -128,11 +129,8 @@ class ProjectsOverviewScreen extends GetView<ProjectController> {
                               const SizedBox(width: AppSpacing.md),
                               ElevatedButton.icon(
                                 onPressed: () {
-                                  if (controller.projects.isNotEmpty) {
-                                    controller.currentProjectId.value = controller.projects.first.id;
-                                  }
                                   Get.dialog(
-                                    const ProjectDeliverablesDialog(),
+                                    const CreateProjectDialog(),
                                     barrierColor: AppColors.primaryContainer.withValues(alpha: 0.5),
                                   );
                                 },
@@ -243,7 +241,6 @@ class ProjectsOverviewScreen extends GetView<ProjectController> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -256,15 +253,42 @@ class ProjectsOverviewScreen extends GetView<ProjectController> {
                   style: AppTypography.labelSm(color: isActive ? AppColors.secondary : AppColors.onSurfaceVariant),
                 ),
               ),
+              if (project.departmentName != null && project.departmentName!.isNotEmpty) ...[
+                const SizedBox(width: AppSpacing.sm),
+                Flexible(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: isDark ? AppColors.darkSurfaceContainer : AppColors.surfaceContainerLow,
+                      borderRadius: BorderRadius.circular(AppRadius.full),
+                      border: Border.all(color: AppColors.outlineVariant.withValues(alpha: 0.5)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.apartment_outlined, size: 12, color: AppColors.secondary),
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            project.departmentName!,
+                            style: AppTypography.labelSm(
+                              color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+              const Spacer(),
               PopupMenuButton<String>(
                 icon: const Icon(Icons.more_vert, color: AppColors.onSurfaceVariant),
                 onSelected: (action) {
                   if (action == 'deliverables') {
-                    controller.currentProjectId.value = project.id;
-                    Get.dialog(
-                      const ProjectDeliverablesDialog(),
-                      barrierColor: AppColors.primaryContainer.withValues(alpha: 0.5),
-                    );
+                    controller.openDeliverablesDialog(project.id);
                   } else if (action == 'toggle_status') {
                     final nextStatus = project.isActive ? 'archived' : 'active';
                     controller.updateProjectStatus(project.id, nextStatus);
@@ -333,7 +357,12 @@ class ProjectsOverviewScreen extends GetView<ProjectController> {
                 children: [
                   const Icon(Icons.calendar_today_outlined, size: 18, color: AppColors.outline),
                   const SizedBox(width: AppSpacing.xs),
-                  Text(project.formattedDate, style: AppTypography.bodyMd(color: AppColors.onSurfaceVariant)),
+                  Text(
+                    project.dueDate != null
+                        ? 'Due ${DateFormat('MMM dd, yyyy').format(project.dueDate!)}'
+                        : project.formattedDate,
+                    style: AppTypography.bodyMd(color: AppColors.onSurfaceVariant),
+                  ),
                 ],
               ),
             ],

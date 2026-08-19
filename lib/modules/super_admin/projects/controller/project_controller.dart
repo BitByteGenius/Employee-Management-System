@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,11 +8,13 @@ import 'package:intl/intl.dart';
 import 'package:tms/core/constants/app_colors.dart';
 import 'package:tms/core/constants/app_sizes.dart';
 import 'package:tms/core/network/api_client.dart';
+import 'package:tms/modules/department/controllers/department_controller.dart';
 import 'package:tms/modules/super_admin/projects/models/dilevariable_models.dart';
 import 'package:tms/modules/super_admin/projects/models/project_model.dart';
 import 'package:tms/modules/super_admin/projects/repositories/project_repository.dart';
 import 'package:tms/modules/super_admin/projects/services/deliverable_service.dart';
 import 'package:tms/modules/super_admin/projects/services/project_service.dart';
+import 'package:tms/modules/super_admin/projects/view/widget/project_deliverables_dialog.dart';
 
 class ProjectController extends GetxController {
   final ProjectRepository repository;
@@ -76,6 +79,10 @@ class ProjectController extends GetxController {
   File? _pickedFileObject;
   final RxBool isSubmitting = false.obs;
 
+  // Department State for Deliverables
+  final Rxn<String> selectedDepartmentId = Rxn<String>();
+  final Rxn<String> selectedDepartmentName = Rxn<String>();
+
   Timer? _searchDebounce;
 
   @override
@@ -91,6 +98,8 @@ class ProjectController extends GetxController {
     notesController.dispose();
     super.onClose();
   }
+
+  PlatformFile? _pickedPlatformFile;
 
   // ==========================================================================
   // FETCH PROJECTS
@@ -155,6 +164,8 @@ class ProjectController extends GetxController {
     String? departmentId,
     String? managerId,
     DateTime? dueDate,
+    PlatformFile? attachedFile,
+    File? file,
   }) async {
     try {
       final newProj = await repository.createProject({
@@ -164,6 +175,24 @@ class ProjectController extends GetxController {
         if (managerId != null && managerId.isNotEmpty) 'manager': managerId,
         if (dueDate != null) 'dueDate': dueDate.toIso8601String(),
       });
+
+      // If a file was attached during project creation, submit it as deliverable/attachment
+      if (attachedFile != null || file != null) {
+        try {
+          await deliverableService.submitDeliverable(
+            projectId: newProj.id,
+            deliverable: DeliverableModel(
+              departmentId: departmentId,
+              submissionDeadline: dueDate,
+              notes: 'Initial Project Attachment',
+            ),
+            platformFile: attachedFile,
+            file: file,
+          );
+        } catch (e) {
+          debugPrint('Deliverable attachment error on create: $e');
+        }
+      }
 
       projects.insert(0, newProj);
       totalProjects.value++;
@@ -241,8 +270,35 @@ class ProjectController extends GetxController {
   }
 
   // ==========================================================================
-  // DELIVERABLES SUBMISSION
+  // DELIVERABLES SUBMISSION & STATE MANAGEMENT
   // ==========================================================================
+
+  void selectDepartment(String id, String name) {
+    selectedDepartmentId.value = id;
+    selectedDepartmentName.value = name;
+  }
+
+  void clearSelectedDepartment() {
+    selectedDepartmentId.value = null;
+    selectedDepartmentName.value = null;
+  }
+
+  void openDeliverablesDialog(String projectId) {
+    currentProjectId.value = projectId;
+    resetDeliverablesForm();
+
+    if (Get.isRegistered<DepartmentController>()) {
+      final deptCtrl = Get.find<DepartmentController>();
+      if (deptCtrl.departments.isEmpty && !deptCtrl.isLoading.value) {
+        deptCtrl.fetchDepartments();
+      }
+    }
+
+    Get.dialog(
+      const ProjectDeliverablesDialog(),
+      barrierColor: AppColors.primaryContainer.withValues(alpha: 0.5),
+    );
+  }
 
   String get formattedDate {
     if (selectedDate.value == null) return '';
@@ -280,10 +336,11 @@ class ProjectController extends GetxController {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
-        allowedExtensions: ['pdf', 'zip', 'png', 'jpg'],
+        allowedExtensions: ['pdf', 'zip', 'png', 'jpg', 'docx', 'xlsx'],
+        withData: true,
       );
 
-      if (result != null && result.files.single.path != null) {
+      if (result != null && result.files.isNotEmpty) {
         final PlatformFile file = result.files.single;
         final double sizeInMb = file.size / (1024 * 1024);
         if (sizeInMb > 50) {
@@ -300,7 +357,12 @@ class ProjectController extends GetxController {
         }
 
         selectedFile.value = file.name;
-        _pickedFileObject = File(file.path!);
+        _pickedPlatformFile = file;
+        if (file.path != null) {
+          _pickedFileObject = File(file.path!);
+        } else {
+          _pickedFileObject = null;
+        }
       }
     } catch (e) {
       debugPrint("Error picking file: $e");
@@ -308,31 +370,30 @@ class ProjectController extends GetxController {
   }
 
   Future<void> submitDeliverables([String? projectId]) async {
-    final targetId = projectId ?? currentProjectId.value;
+    if (isSubmitting.value) return;
+
+    final targetId = (projectId != null && projectId.isNotEmpty)
+        ? projectId
+        : currentProjectId.value;
 
     if (targetId.isEmpty) {
-      if (projects.isNotEmpty) {
-        currentProjectId.value = projects.first.id;
-      } else {
-        Get.snackbar(
-          'Error',
-          'No active project available to attach deliverables.',
-          backgroundColor: AppColors.error,
-          colorText: AppColors.onError,
-          snackPosition: SnackPosition.BOTTOM,
-          margin: AppSpacing.paddingLg,
-          borderRadius: AppRadius.md,
-        );
-        return;
-      }
+      Get.snackbar(
+        'Validation Error',
+        'No project selected. Please select a valid project to submit deliverables.',
+        backgroundColor: AppColors.error,
+        colorText: AppColors.onError,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: AppSpacing.paddingLg,
+        borderRadius: AppRadius.md,
+      );
+      return;
     }
-
-    final finalProjectId = targetId.isNotEmpty ? targetId : currentProjectId.value;
 
     try {
       isSubmitting.value = true;
 
       final deliverableModel = DeliverableModel(
+        departmentId: selectedDepartmentId.value,
         externalLink: externalLinkController.text.trim().isNotEmpty
             ? externalLinkController.text.trim()
             : null,
@@ -343,13 +404,16 @@ class ProjectController extends GetxController {
       );
 
       final success = await deliverableService.submitDeliverable(
-        projectId: finalProjectId,
+        projectId: targetId,
         deliverable: deliverableModel,
+        platformFile: _pickedPlatformFile,
         file: _pickedFileObject,
       );
 
       if (success) {
-        Get.back();
+        if (Get.isDialogOpen ?? false) {
+          Get.back();
+        }
         Get.snackbar(
           'Success',
           'Deliverables have been submitted successfully.',
@@ -359,12 +423,12 @@ class ProjectController extends GetxController {
           margin: AppSpacing.paddingLg,
           borderRadius: AppRadius.md,
         );
-        _resetForm();
+        resetDeliverablesForm();
         fetchProjects(refresh: true);
       } else {
         Get.snackbar(
           'Error',
-          'Failed to submit deliverables. Please try again.',
+          'Failed to submit deliverables. Please verify your submission details.',
           backgroundColor: AppColors.error,
           colorText: AppColors.onError,
           snackPosition: SnackPosition.BOTTOM,
@@ -374,8 +438,8 @@ class ProjectController extends GetxController {
       }
     } catch (e) {
       Get.snackbar(
-        'Error',
-        'An unexpected error occurred: $e',
+        'Submission Failed',
+        _friendlyError(e),
         backgroundColor: AppColors.error,
         colorText: AppColors.onError,
         snackPosition: SnackPosition.BOTTOM,
@@ -387,20 +451,49 @@ class ProjectController extends GetxController {
     }
   }
 
-  void _resetForm() {
+  void resetDeliverablesForm() {
     externalLinkController.clear();
     notesController.clear();
     selectedDate.value = null;
     selectedFile.value = null;
     _pickedFileObject = null;
+    selectedDepartmentId.value = null;
+    selectedDepartmentName.value = null;
+  }
+
+  void resetForm() {
+    resetDeliverablesForm();
   }
 
   String _friendlyError(Object error) {
+    if (error is DioException) {
+      if (error.response?.data is Map && error.response?.data['message'] != null) {
+        return error.response!.data['message'].toString();
+      }
+      final status = error.response?.statusCode;
+      if (status == 400) return 'Invalid request data. Please check the entered fields.';
+      if (status == 401) return 'Authentication required. Please log in again.';
+      if (status == 403) return 'You do not have permission to perform this action.';
+      if (status == 404) return 'Project or resource not found.';
+      if (status == 409) return 'A resource conflict occurred. Please review your details.';
+      if (status == 413) return 'Uploaded file exceeds the maximum 50MB limit.';
+      if (status != null && status >= 500) return 'Server error. Please try again later.';
+      if (error.type == DioExceptionType.connectionTimeout ||
+          error.type == DioExceptionType.receiveTimeout) {
+        return 'Connection timed out. Please check your network connection.';
+      }
+      if (error.type == DioExceptionType.connectionError) {
+        return 'Unable to reach the server. Please check your internet connection.';
+      }
+    }
     final message = error.toString();
-    if (message.contains('401')) return 'Authentication required.';
-    if (message.contains('403')) return 'Permission denied.';
-    if (message.contains('404')) return 'Project not found.';
-    if (message.contains('500')) return 'Server error. Please try again.';
+    if (message.contains('400')) return 'Invalid request data. Please check the entered fields.';
+    if (message.contains('401')) return 'Authentication required. Please log in again.';
+    if (message.contains('403')) return 'You do not have permission to perform this action.';
+    if (message.contains('404')) return 'Project or resource not found.';
+    if (message.contains('409')) return 'A resource conflict occurred. Please review your details.';
+    if (message.contains('413')) return 'Uploaded file exceeds the maximum 50MB limit.';
+    if (message.contains('500')) return 'Server error. Please try again later.';
     return message.replaceFirst('Exception: ', '');
   }
 }
