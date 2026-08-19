@@ -942,129 +942,71 @@ class SuperAdminDashboardView
             height: AppSpacing.sm,
           ),
 
-          ListView.separated(
-            shrinkWrap: true,
-            physics:
-                const NeverScrollableScrollPhysics(),
-            itemCount:
-                controller
-                    .auditLogs
-                    .length,
-            separatorBuilder:
-                (_, __) =>
+          if (controller.auditLogs.isEmpty)
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Center(
+                child: Text(
+                  'No recent audit events',
+                  style: AppTypography.bodyMd(
+                    color: isDark
+                        ? AppColors.darkOnSurfaceVariant
+                        : AppColors.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            )
+          else
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: controller.auditLogs.take(6).length,
+              separatorBuilder: (_, __) => const SizedBox(
+                height: AppSpacing.md,
+              ),
+              itemBuilder: (context, index) {
+                final item = controller.auditLogs[index];
+                final rawAction = (item['title'] ?? item['action'] ?? 'System Event').toString();
+                final time = (item['time'] ?? 'Recently').toString();
+
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 7,
+                      height: 7,
+                      decoration: const BoxDecoration(
+                        color: AppColors.secondary,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
                     const SizedBox(
-              height:
-                  AppSpacing.md,
+                      width: AppSpacing.sm + 2,
+                    ),
+                    Expanded(
+                      child: Text(
+                        rawAction,
+                        style: AppTypography.bodyMd(
+                          color: isDark
+                              ? AppColors.darkOnSurface
+                              : AppColors.primary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Text(
+                      time,
+                      style: AppTypography.labelSm(
+                        color: isDark
+                            ? AppColors.darkOnSurfaceVariant
+                            : AppColors.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
-            itemBuilder:
-                (context, index) {
-              final item =
-                  controller
-                      .auditLogs[index];
-
-              return Row(
-                crossAxisAlignment:
-                    CrossAxisAlignment
-                        .start,
-                children: [
-                  Container(
-                    margin:
-                        const EdgeInsets
-                            .only(
-                      top: 4,
-                    ),
-                    width: 8,
-                    height: 8,
-                    decoration:
-                        const BoxDecoration(
-                      color: AppColors
-                          .secondary,
-                      shape:
-                          BoxShape.circle,
-                    ),
-                  ),
-
-                  const SizedBox(
-                    width:
-                        AppSpacing.sm,
-                  ),
-
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment:
-                          CrossAxisAlignment
-                              .start,
-                      children: [
-                        Row(
-                          mainAxisAlignment:
-                              MainAxisAlignment
-                                  .spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                item[
-                                        'title'] ??
-                                    item[
-                                        'action'] ??
-                                    'System Event',
-                                style:
-                                    AppTypography
-                                        .bodyMd(
-                                  color: isDark
-                                      ? AppColors
-                                          .darkOnSurface
-                                      : AppColors
-                                          .primary,
-                                  fontWeight:
-                                      FontWeight
-                                          .w500,
-                                ),
-                              ),
-                            ),
-                            Text(
-                              item[
-                                      'time'] ??
-                                  'Recently',
-                              style:
-                                  AppTypography
-                                      .labelSm(
-                                color: isDark
-                                    ? AppColors
-                                        .darkOnSurfaceVariant
-                                    : AppColors
-                                        .onSurfaceVariant,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(
-                          height: 2,
-                        ),
-
-                        Text(
-                          item[
-                                  'description'] ??
-                              item[
-                                  'details'] ??
-                              '',
-                          style:
-                              AppTypography
-                                  .labelSm(
-                            color: isDark
-                                ? AppColors
-                                    .darkOnSurfaceVariant
-                                : AppColors
-                                    .onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
         ],
       ),
     );

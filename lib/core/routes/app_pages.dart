@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import 'package:tms/modules/admin/bindings/admin_dashboard_binding.dart';
-import 'package:tms/modules/admin/views/admin_dashboard_view.dart';
+import 'package:tms/modules/admin/dashboard/bindings/admin_dashboard_binding.dart';
+import 'package:tms/modules/admin/dashboard/views/admin_dashboard_view.dart';
 import 'package:tms/modules/auth/bindings/auth_binding.dart';
 import 'package:tms/modules/auth/views/login_view.dart';
 import 'package:tms/modules/auth/views/register_view.dart';

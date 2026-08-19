@@ -57,6 +57,13 @@ class AppTypography {
         color: color,
       );
 
+  static TextStyle bodySm({Color? color, FontWeight? fontWeight}) => GoogleFonts.inter(
+        fontSize: 13,
+        height: 18 / 13,
+        fontWeight: fontWeight ?? FontWeight.w400,
+        color: color,
+      );
+
   static TextStyle labelMd({Color? color, FontWeight? fontWeight}) => GoogleFonts.jetBrainsMono(
         fontSize: 12,
         height: 16 / 12,

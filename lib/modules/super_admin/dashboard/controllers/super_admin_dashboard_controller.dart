@@ -91,7 +91,7 @@ class SuperAdminDashboardController extends GetxController {
         final auditRes = await _api.dio.get(ApiEndpoints.auditLogs);
         if (auditRes.data != null && auditRes.data['success'] == true) {
           final List list = auditRes.data['data'] ?? [];
-          auditLogs.assignAll(list.cast<Map<String, dynamic>>().take(10).toList());
+          auditLogs.assignAll(list.cast<Map<String, dynamic>>().take(6).toList());
         }
       } catch (_) {}
 

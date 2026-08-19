@@ -31,18 +31,31 @@ class QueueSummaryCard extends StatelessWidget {
           // Label
           Text(
             'QUEUE SUMMARY',
-            style: AppTypography.labelSm(color: _muted(isDark)),
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.6,
+              color: isDark
+                  ? const Color(0xFF94A3B8)
+                  : const Color(0xFF64748B),
+            ),
           ),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: AppSpacing.sm + 4),
 
           // Total count — large
           Text(
             '$total',
-            style: AppTypography.headlineLg(color: _text(isDark)),
+            style: TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.w800,
+              color: _text(isDark),
+              height: 1.1,
+            ),
           ),
+          const SizedBox(height: 2),
           Text(
             'Total Pending',
-            style: AppTypography.bodyMd(color: _muted(isDark)),
+            style: AppTypography.bodySm(color: _muted(isDark)),
           ),
           const SizedBox(height: AppSpacing.lg),
 
@@ -50,7 +63,7 @@ class QueueSummaryCard extends StatelessWidget {
           _MetricDot(
             label: 'Admins',
             value: admins,
-            color: AppColors.primary,
+            color: const Color(0xFF6366F1),
           ),
           const SizedBox(height: AppSpacing.sm),
 
@@ -58,23 +71,35 @@ class QueueSummaryCard extends StatelessWidget {
           _MetricDot(
             label: 'Employees',
             value: employees,
-            color: AppColors.outlineVariant,
+            color: const Color(0xFF2563EB),
           ),
           const SizedBox(height: AppSpacing.lg),
 
           // Export button
           SizedBox(
             width: double.infinity,
+            height: 38,
             child: OutlinedButton.icon(
               onPressed: onExport,
-              icon: const Icon(Icons.download_outlined, size: AppSizes.iconSm),
+              icon: const Icon(Icons.download_rounded, size: 16),
               label: const Text('Export List'),
               style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: AppColors.outlineVariant),
+                side: BorderSide(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.12)
+                      : AppColors.outlineVariant,
+                ),
                 foregroundColor: _text(isDark),
-                textStyle: AppTypography.labelMd(fontWeight: FontWeight.w600),
+                textStyle: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
                 padding: const EdgeInsets.symmetric(
-                  vertical: AppSpacing.sm,
+                  vertical: 0,
+                  horizontal: AppSpacing.md,
                 ),
               ),
             ),
@@ -108,28 +133,35 @@ class AssignmentRulesCard extends StatelessWidget {
               shape: BoxShape.circle,
             ),
             child: const Icon(
-              Icons.info_outline,
+              Icons.info_outline_rounded,
               color: AppColors.secondary,
-              size: AppSizes.iconSm,
+              size: 16,
             ),
           ),
-          const SizedBox(width: AppSpacing.sm),
+          const SizedBox(width: AppSpacing.sm + 2),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'Assignment Rules',
-                  style: AppTypography.bodyMd(
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
                     color: _text(isDark),
-                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(height: AppSpacing.xs),
+                const SizedBox(height: 4),
                 Text(
                   'Administrators require department assignment prior to approval. '
                   'Employee roles determine their base permissions across assigned projects.',
-                  style: AppTypography.bodyMd(color: AppColors.secondary),
+                  style: TextStyle(
+                    fontSize: 12,
+                    height: 1.4,
+                    color: isDark
+                        ? const Color(0xFF94A3B8)
+                        : const Color(0xFF64748B),
+                  ),
                 ),
               ],
             ),
@@ -154,10 +186,10 @@ class _AccessCard extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(AppSpacing.md),
+      padding: const EdgeInsets.all(AppSpacing.md + 4),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurface : AppColors.surfaceContainerLowest,
-        borderRadius: AppRadius.borderMd,
+        color: isDark ? const Color(0xFF0F172A) : Colors.white,
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isDark
               ? Colors.white.withValues(alpha: 0.08)
@@ -189,19 +221,32 @@ class _MetricDot extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Row(
       children: [
-        Icon(Icons.circle, size: 8, color: color),
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+          ),
+        ),
         const SizedBox(width: AppSpacing.sm),
         Expanded(
           child: Text(
             label,
-            style: AppTypography.bodyMd(color: _text(isDark)),
+            style: TextStyle(
+              fontSize: 13,
+              color: isDark
+                  ? const Color(0xFFCBD5E1)
+                  : const Color(0xFF334155),
+            ),
           ),
         ),
         Text(
           '$value',
-          style: AppTypography.bodyMd(
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
             color: _text(isDark),
-            fontWeight: FontWeight.w600,
           ),
         ),
       ],
@@ -212,4 +257,4 @@ class _MetricDot extends StatelessWidget {
 Color _text(bool isDark) =>
     isDark ? AppColors.darkOnSurface : AppColors.onSurface;
 Color _muted(bool isDark) =>
-    isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant;
+    isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);

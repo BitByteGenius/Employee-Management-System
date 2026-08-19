@@ -22,21 +22,27 @@ class PendingApprovalTable extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurface : AppColors.surfaceContainerLowest,
-        borderRadius: AppRadius.borderMd,
+        color: isDark ? const Color(0xFF0F172A) : Colors.white,
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isDark
               ? Colors.white.withValues(alpha: 0.08)
               : AppColors.outlineVariant,
         ),
       ),
+      clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
           AccessControlToolbar(controller: controller),
-          const Divider(height: 1),
+          Divider(
+            height: 1,
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.08)
+                : AppColors.outlineVariant,
+          ),
           if (controller.isLoading.value)
             const Padding(
-              padding: EdgeInsets.all(AppSpacing.md),
+              padding: EdgeInsets.all(AppSpacing.lg),
               child: AppLoadingSkeleton(height: 260),
             )
           else if (controller.errorMessage.value.isNotEmpty)
@@ -56,7 +62,12 @@ class PendingApprovalTable extends StatelessWidget {
             )
           else
             _ResponsiveRows(controller: controller),
-          const Divider(height: 1),
+          Divider(
+            height: 1,
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.08)
+                : AppColors.outlineVariant,
+          ),
           _Pagination(controller: controller),
         ],
       ),
@@ -75,39 +86,84 @@ class AccessControlToolbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isMobile = AppBreakpoints.isMobile(MediaQuery.sizeOf(context).width);
+
     return Padding(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      child: Wrap(
-        spacing: AppSpacing.sm,
-        runSpacing: AppSpacing.sm,
-        alignment: WrapAlignment.spaceBetween,
-        crossAxisAlignment: WrapCrossAlignment.center,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm + 4,
+      ),
+      child: Row(
         children: [
           // Search field
-          SizedBox(
-            width: isMobile ? double.infinity : 280,
-            child: TextField(
-              onChanged: controller.onSearchChanged,
-              decoration: const InputDecoration(
-                hintText: 'Search pending users...',
-                prefixIcon: Icon(Icons.search, size: AppSizes.iconSm),
-                isDense: true,
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: AppSpacing.sm,
-                  vertical: AppSpacing.sm,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: AppRadius.borderSm,
-                  borderSide: BorderSide(color: AppColors.outlineVariant),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: AppRadius.borderSm,
-                  borderSide: BorderSide(color: AppColors.outlineVariant),
+          Expanded(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: isMobile ? double.infinity : 320,
+              ),
+              child: SizedBox(
+                height: 38,
+                child: TextField(
+                  onChanged: controller.onSearchChanged,
+                  style: AppTypography.bodySm(
+                    color: isDark
+                        ? AppColors.darkOnSurface
+                        : AppColors.onSurface,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: 'Search pending users...',
+                    hintStyle: AppTypography.bodySm(
+                      color: isDark
+                          ? AppColors.darkOnSurfaceVariant.withValues(alpha: 0.6)
+                          : AppColors.onSurfaceVariant,
+                    ),
+                    prefixIcon: Icon(
+                      Icons.search_rounded,
+                      size: 18,
+                      color: isDark
+                          ? AppColors.darkOnSurfaceVariant
+                          : AppColors.onSurfaceVariant,
+                    ),
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                      vertical: 8,
+                    ),
+                    filled: true,
+                    fillColor: isDark
+                        ? Colors.white.withValues(alpha: 0.04)
+                        : const Color(0xFFF8FAFC),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.12)
+                            : AppColors.outlineVariant,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.12)
+                            : AppColors.outlineVariant,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(
+                        color: AppColors.secondary,
+                        width: 1.5,
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
           ),
+
+          const SizedBox(width: AppSpacing.sm),
 
           // Filter + Sort buttons
           Row(
@@ -117,7 +173,7 @@ class AccessControlToolbar extends StatelessWidget {
               PopupMenuButton<String>(
                 tooltip: 'Filter by role',
                 onSelected: controller.applyRoleFilter,
-                offset: const Offset(0, 36),
+                offset: const Offset(0, 42),
                 itemBuilder: (_) => [
                   const PopupMenuItem(value: '', child: Text('All Roles')),
                   ...controller.roles.map((role) {
@@ -130,22 +186,22 @@ class AccessControlToolbar extends StatelessWidget {
                   }),
                 ],
                 child: const _ToolbarButton(
-                  icon: Icons.filter_list,
+                  icon: Icons.filter_list_rounded,
                   label: 'Filter',
                 ),
               ),
-              const SizedBox(width: AppSpacing.sm),
+              const SizedBox(width: AppSpacing.xs + 4),
               // Sort
               PopupMenuButton<String>(
                 tooltip: 'Sort',
                 onSelected: controller.setSort,
-                offset: const Offset(0, 36),
+                offset: const Offset(0, 42),
                 itemBuilder: (_) => const [
                   PopupMenuItem(value: 'fullName', child: Text('Name')),
                   PopupMenuItem(value: 'createdAt', child: Text('Date')),
                 ],
                 child: const _ToolbarButton(
-                  icon: Icons.sort,
+                  icon: Icons.sort_rounded,
                   label: 'Sort',
                 ),
               ),
@@ -185,7 +241,6 @@ class _ResponsiveRows extends StatelessWidget {
       ],
     );
   }
-
 }
 
 // ============================================================================
@@ -200,16 +255,17 @@ class _TableHeader extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       color: isDark
-          ? AppColors.darkSurfaceContainer
-          : AppColors.surfaceContainerLow,
+          ? const Color(0xFF131D31)
+          : const Color(0xFFF8FAFC),
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
-        vertical: AppSpacing.sm,
+        vertical: 10,
       ),
       child: const Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           _HeadCell('USER', flex: 4),
-          _HeadCell('REQUESTED\nROLE', flex: 2),
+          _HeadCell('REQUESTED ROLE', flex: 2),
           _HeadCell('DATE', flex: 2),
           _HeadCell('ASSIGNMENT', flex: 2),
           _HeadCell('ACTIONS', flex: 3),
@@ -239,36 +295,67 @@ class PendingUserRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
-        vertical: AppSpacing.md,
+        vertical: 12,
       ),
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
             color: isDark
-                ? Colors.white.withValues(alpha: 0.06)
-                : AppColors.surfaceVariant,
+                ? Colors.white.withValues(alpha: 0.05)
+                : const Color(0xFFF1F5F9),
           ),
         ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Expanded(flex: 4, child: _UserIdentity(user: user)),
-          Expanded(flex: 2, child: _RoleBadge(role: user.role)),
           Expanded(
-            flex: 2,
-            child: Text(
-              AppDateFormatter.tableDate(user.createdAt),
-              style: AppTypography.bodyMd(),
+            flex: 4,
+            child: Padding(
+              padding: const EdgeInsets.only(right: AppSpacing.sm),
+              child: _UserIdentity(user: user),
             ),
           ),
           Expanded(
             flex: 2,
-            child: _AssignmentButton(user: user, controller: controller),
+            child: Padding(
+              padding: const EdgeInsets.only(right: AppSpacing.sm),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: _RoleBadge(role: user.role),
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Padding(
+              padding: const EdgeInsets.only(right: AppSpacing.sm),
+              child: Text(
+                AppDateFormatter.tableDate(user.createdAt),
+                style: AppTypography.bodySm(
+                  color: isDark
+                      ? const Color(0xFF94A3B8)
+                      : const Color(0xFF64748B),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Padding(
+              padding: const EdgeInsets.only(right: AppSpacing.sm),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: _AssignmentButton(user: user, controller: controller),
+              ),
+            ),
           ),
           Expanded(
             flex: 3,
-            child: _ActionButtons(user: user, controller: controller),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: _ActionButtons(user: user, controller: controller),
+            ),
           ),
         ],
       ),
@@ -288,10 +375,17 @@ class _MobileUserCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: AppColors.surfaceVariant)),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.05)
+                : const Color(0xFFF1F5F9),
+          ),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -306,14 +400,19 @@ class _MobileUserCard extends StatelessWidget {
               _RoleBadge(role: user.role),
               Text(
                 AppDateFormatter.tableDate(user.createdAt),
-                style: AppTypography.bodyMd(),
+                style: AppTypography.bodySm(
+                  color: isDark
+                      ? const Color(0xFF94A3B8)
+                      : const Color(0xFF64748B),
+                ),
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: AppSpacing.md),
           Wrap(
             spacing: AppSpacing.sm,
             runSpacing: AppSpacing.sm,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               _AssignmentButton(user: user, controller: controller),
               _ActionButtons(user: user, controller: controller),
@@ -334,17 +433,16 @@ class _UserIdentity extends StatelessWidget {
 
   final AccessControlPendingUser user;
 
-  // Deterministic avatar color from user name
   Color _avatarColor() {
     const colors = [
-      Color(0xFF1565C0), // deep blue
-      Color(0xFF2E7D32), // deep green
-      Color(0xFF6A1B9A), // deep purple
-      Color(0xFF00695C), // teal
-      Color(0xFFC62828), // deep red
-      Color(0xFF4527A0), // indigo
-      Color(0xFF00838F), // cyan
-      Color(0xFF558B2F), // olive
+      Color(0xFF2563EB), // Blue
+      Color(0xFF16A34A), // Green
+      Color(0xFF9333EA), // Purple
+      Color(0xFF0D9488), // Teal
+      Color(0xFFEA580C), // Orange
+      Color(0xFF4F46E5), // Indigo
+      Color(0xFF0284C7), // Sky
+      Color(0xFF65A30D), // Lime
     ];
     final index = user.fullName.codeUnits.fold(0, (a, b) => a + b) %
         colors.length;
@@ -353,35 +451,48 @@ class _UserIdentity extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final avatarColor = _avatarColor();
+
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         CircleAvatar(
-          radius: 18,
+          radius: 17,
           backgroundColor: avatarColor,
           child: Text(
             user.initials,
-            style: AppTypography.labelMd(
+            style: const TextStyle(
               color: Colors.white,
+              fontSize: 12,
               fontWeight: FontWeight.w700,
             ),
           ),
         ),
-        const SizedBox(width: AppSpacing.sm),
+        const SizedBox(width: AppSpacing.sm + 2),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 user.fullName,
-                style:
-                    AppTypography.bodyMd(fontWeight: FontWeight.w600),
+                style: AppTypography.bodyMd(
+                  fontWeight: FontWeight.w600,
+                  color: isDark
+                      ? AppColors.darkOnSurface
+                      : AppColors.onSurface,
+                ),
                 overflow: TextOverflow.ellipsis,
               ),
+              const SizedBox(height: 1),
               Text(
                 user.email,
                 style: AppTypography.labelSm(
-                    color: AppColors.onSurfaceVariant),
+                  color: isDark
+                      ? const Color(0xFF94A3B8)
+                      : const Color(0xFF64748B),
+                ),
                 overflow: TextOverflow.ellipsis,
               ),
             ],
@@ -404,20 +515,38 @@ class _AssignmentButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final label = user.isAdmin ? 'Assign Dept' : 'Assign Role';
+
     return OutlinedButton(
       onPressed: () => user.isAdmin
           ? showDepartmentAssignmentDialog(controller, user)
           : showRoleAssignmentDialog(controller, user),
       style: OutlinedButton.styleFrom(
         padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.sm,
-          vertical: AppSpacing.xs,
+          horizontal: 14,
+          vertical: 6,
         ),
-        textStyle: AppTypography.labelMd(fontWeight: FontWeight.w600),
-        side: const BorderSide(color: AppColors.outlineVariant),
+        minimumSize: const Size(0, 32),
+        textStyle: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.2,
+        ),
+        foregroundColor: isDark
+            ? const Color(0xFF93C5FD)
+            : const Color(0xFF2563EB),
+        side: BorderSide(
+          color: isDark
+              ? const Color(0xFF3B82F6).withValues(alpha: 0.4)
+              : const Color(0xFF93C5FD),
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
       ),
       child: Text(
-        user.isAdmin ? 'Assign Dept' : 'Assign Role',
+        label,
         overflow: TextOverflow.ellipsis,
       ),
     );
@@ -436,11 +565,12 @@ class _ActionButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      spacing: AppSpacing.xs,
-      runSpacing: AppSpacing.xs,
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        // Deny always shown
+        // Deny Button
         OutlinedButton(
           onPressed: () => showApprovalConfirmation(
             controller: controller,
@@ -449,15 +579,31 @@ class _ActionButtons extends StatelessWidget {
           ),
           style: OutlinedButton.styleFrom(
             padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.sm,
-              vertical: AppSpacing.xs,
+              horizontal: 14,
+              vertical: 6,
             ),
-            textStyle: AppTypography.labelMd(fontWeight: FontWeight.w600),
-            side: const BorderSide(color: AppColors.outlineVariant),
+            minimumSize: const Size(0, 32),
+            textStyle: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.2,
+            ),
+            foregroundColor: isDark
+                ? const Color(0xFFF87171)
+                : const Color(0xFFDC2626),
+            side: BorderSide(
+              color: isDark
+                  ? const Color(0xFFEF4444).withValues(alpha: 0.4)
+                  : const Color(0xFFFCA5A5),
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
           ),
           child: const Text('Deny'),
         ),
-        // Approve
+        const SizedBox(width: AppSpacing.xs + 2),
+        // Approve Button
         ElevatedButton(
           onPressed: () => showApprovalConfirmation(
             controller: controller,
@@ -465,14 +611,22 @@ class _ActionButtons extends StatelessWidget {
             approve: true,
           ),
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.secondary,
+            backgroundColor: const Color(0xFF2563EB),
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.sm,
-              vertical: AppSpacing.xs,
+              horizontal: 16,
+              vertical: 6,
             ),
-            textStyle: AppTypography.labelMd(fontWeight: FontWeight.w600),
+            minimumSize: const Size(0, 32),
             elevation: 0,
+            textStyle: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.2,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
           ),
           child: const Text('Approve'),
         ),
@@ -482,7 +636,7 @@ class _ActionButtons extends StatelessWidget {
 }
 
 // ============================================================================
-// Role Badge
+// Role Badge (Dark & Light theme aware)
 // ============================================================================
 
 class _RoleBadge extends StatelessWidget {
@@ -492,34 +646,58 @@ class _RoleBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isAdmin = role.toLowerCase() == 'admin';
-    final bgColor = isAdmin
-        ? AppColors.primaryContainer   // dark navy for admin
-        : const Color(0xFFE8F0FE);    // light blue-grey for employee
-    final textColor = isAdmin
-        ? const Color(0xFF7C839B)      // muted on dark navy
-        : AppColors.secondary;        // blue on light
+
+    final Color bgColor;
+    final Color textColor;
+    final Color borderColor;
+
+    if (isAdmin) {
+      bgColor = isDark
+          ? const Color(0xFF6366F1).withValues(alpha: 0.15)
+          : const Color(0xFFEEF2FF);
+      textColor = isDark ? const Color(0xFFA5B4FC) : const Color(0xFF4F46E5);
+      borderColor = isDark
+          ? const Color(0xFF818CF8).withValues(alpha: 0.3)
+          : const Color(0xFFC7D2FE);
+    } else {
+      bgColor = isDark
+          ? const Color(0xFF2563EB).withValues(alpha: 0.15)
+          : const Color(0xFFEFF6FF);
+      textColor = isDark ? const Color(0xFF93C5FD) : const Color(0xFF1D4ED8);
+      borderColor = isDark
+          ? const Color(0xFF3B82F6).withValues(alpha: 0.3)
+          : const Color(0xFFBFDBFE);
+    }
+
     final icon = isAdmin
         ? Icons.admin_panel_settings_outlined
-        : Icons.person_outline;
+        : Icons.person_outline_rounded;
 
     return Container(
       padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
+        horizontal: 8,
         vertical: 3,
       ),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: AppRadius.borderSm,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: borderColor, width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 11, color: textColor),
-          const SizedBox(width: 3),
+          Icon(icon, size: 12, color: textColor),
+          const SizedBox(width: 4),
           Text(
             role.toUpperCase(),
-            style: AppTypography.labelSm(color: textColor),
+            style: TextStyle(
+              color: textColor,
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.4,
+            ),
           ),
         ],
       ),
@@ -538,13 +716,26 @@ class _HeadCell extends StatelessWidget {
   final int flex;
 
   @override
-  Widget build(BuildContext context) => Expanded(
-        flex: flex,
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Expanded(
+      flex: flex,
+      child: Padding(
+        padding: const EdgeInsets.only(right: AppSpacing.sm),
         child: Text(
           label,
-          style: AppTypography.labelSm(color: AppColors.onSurfaceVariant),
+          style: TextStyle(
+            color: isDark
+                ? const Color(0xFF94A3B8)
+                : const Color(0xFF64748B),
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.6,
+          ),
         ),
-      );
+      ),
+    );
+  }
 }
 
 // ============================================================================
@@ -561,21 +752,42 @@ class _ToolbarButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
+      height: 38,
       padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: AppSpacing.sm,
+        horizontal: AppSpacing.sm + 4,
       ),
       decoration: BoxDecoration(
-        border: Border.all(color: AppColors.outlineVariant),
-        borderRadius: AppRadius.borderSm,
-        color: isDark ? AppColors.darkSurface : AppColors.surfaceContainerLowest,
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.12)
+              : AppColors.outlineVariant,
+        ),
+        borderRadius: BorderRadius.circular(8),
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.04)
+            : const Color(0xFFF8FAFC),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: AppSizes.iconSm, color: AppColors.onSurfaceVariant),
+          Icon(
+            icon,
+            size: 16,
+            color: isDark
+                ? const Color(0xFF94A3B8)
+                : const Color(0xFF64748B),
+          ),
           const SizedBox(width: AppSpacing.xs),
-          Text(label, style: AppTypography.labelMd()),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: isDark
+                  ? AppColors.darkOnSurface
+                  : AppColors.onSurface,
+            ),
+          ),
         ],
       ),
     );
@@ -597,17 +809,18 @@ class _Pagination extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
-        vertical: AppSpacing.sm,
+        vertical: 8,
       ),
       child: Row(
         children: [
           Expanded(
             child: Text(
               'Showing ${controller.startItem}-${controller.endItem} of ${controller.totalPending.value} pending',
-              style: AppTypography.labelSm(
+              style: TextStyle(
+                fontSize: 12,
                 color: isDark
-                    ? AppColors.darkOnSurfaceVariant
-                    : AppColors.onSurfaceVariant,
+                    ? const Color(0xFF94A3B8)
+                    : const Color(0xFF64748B),
               ),
             ),
           ),
@@ -615,24 +828,37 @@ class _Pagination extends StatelessWidget {
             onPressed: controller.currentPage.value > 1
                 ? controller.previousPage
                 : null,
-            icon: const Icon(Icons.chevron_left),
-            iconSize: AppSizes.iconMd,
+            icon: const Icon(Icons.chevron_left_rounded),
+            iconSize: 20,
             splashRadius: 18,
+            color: isDark
+                ? AppColors.darkOnSurface
+                : AppColors.onSurface,
           ),
           Text(
             '${controller.currentPage.value} / ${controller.totalPages}',
-            style: AppTypography.labelSm(),
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: isDark
+                  ? AppColors.darkOnSurface
+                  : AppColors.onSurface,
+            ),
           ),
           IconButton(
             onPressed: controller.currentPage.value < controller.totalPages
                 ? controller.nextPage
                 : null,
-            icon: const Icon(Icons.chevron_right),
-            iconSize: AppSizes.iconMd,
+            icon: const Icon(Icons.chevron_right_rounded),
+            iconSize: 20,
             splashRadius: 18,
+            color: isDark
+                ? AppColors.darkOnSurface
+                : AppColors.onSurface,
           ),
         ],
       ),
     );
   }
 }
+
