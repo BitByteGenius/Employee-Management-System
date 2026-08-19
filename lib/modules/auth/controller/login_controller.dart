@@ -48,8 +48,9 @@ class LoginController extends GetxController {
       );
       await _storage.saveUser(user);
 
+      final roleStr = (user['systemRole'] ?? user['role'] ?? '').toString();
       Get.offAllNamed(
-        AppRoutes.dashboardForRole(user['role']?.toString() ?? ''),
+        AppRoutes.dashboardForRole(roleStr),
       );
     } catch (error) {
       errorMessage.value = _messageFromError(error);

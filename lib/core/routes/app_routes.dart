@@ -28,15 +28,14 @@ abstract class AppRoutes {
 
   /// Returns the dashboard route based on the user's role.
   static String dashboardForRole(String role) {
-    switch (role) {
-      case 'super_admin':
-        return superAdminDashboard;
-      case 'admin':
-        return adminDashboard;
-      case 'employee':
-        return employeeDashboard;
-      default:
-        return login;
+    final normalized = role.toLowerCase().trim();
+    if (normalized.contains('super')) {
+      return superAdminDashboard;
+    } else if (normalized.contains('admin')) {
+      return adminDashboard;
+    } else if (normalized.contains('employee')) {
+      return employeeDashboard;
     }
+    return login;
   }
 }
