@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -27,6 +28,7 @@ class _AssignTaskDialogState extends State<AssignTaskDialog> {
   String? _selectedAssigneeId;
   String _selectedPriority = 'Medium';
   DateTime? _selectedDueDate;
+  PlatformFile? _attachedFile;
 
   final List<String> _priorityOptions = ['Low', 'Medium', 'High', 'Urgent'];
 
@@ -52,6 +54,36 @@ class _AssignTaskDialogState extends State<AssignTaskDialog> {
     }
   }
 
+  Future<void> _pickFile() async {
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf', 'zip', 'png', 'jpg', 'jpeg', 'docx', 'xlsx', 'csv', 'txt'],
+        withData: true,
+      );
+
+      if (result != null && result.files.isNotEmpty) {
+        final file = result.files.single;
+        final double sizeInMb = file.size / (1024 * 1024);
+        if (sizeInMb > 50) {
+          Get.snackbar(
+            'Upload Failed',
+            'File size exceeds the 50MB limit.',
+            backgroundColor: AppColors.error,
+            colorText: AppColors.onError,
+            snackPosition: SnackPosition.BOTTOM,
+          );
+          return;
+        }
+        setState(() {
+          _attachedFile = file;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error picking file: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -62,7 +94,7 @@ class _AssignTaskDialogState extends State<AssignTaskDialog> {
       backgroundColor: isDark ? AppColors.darkSurface : AppColors.surfaceContainerLowest,
       insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 520, maxHeight: 680),
+        constraints: const BoxConstraints(maxWidth: 540, maxHeight: 740),
         child: Column(
           children: [
             // Header
@@ -101,13 +133,34 @@ class _AssignTaskDialogState extends State<AssignTaskDialog> {
                           ],
                         ),
                         const SizedBox(height: 3),
-                        Text(
-                          'Project: ${widget.project.name}',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: AppTypography.labelMd(
-                            color: AppColors.secondary,
-                          ).copyWith(fontWeight: FontWeight.w600),
+                        Row(
+                          children: [
+                            Text(
+                              'Project: ${widget.project.name}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTypography.labelMd(
+                                color: AppColors.secondary,
+                              ).copyWith(fontWeight: FontWeight.w600),
+                            ),
+                            if (controller.departmentName.value.isNotEmpty) ...[
+                              const SizedBox(width: AppSpacing.xs),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: AppColors.secondary.withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  controller.departmentName.value,
+                                  style: AppTypography.labelSm(color: AppColors.secondary).copyWith(
+                                    fontSize: 10.5,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                       ],
                     ),
@@ -153,9 +206,9 @@ class _AssignTaskDialogState extends State<AssignTaskDialog> {
 
                       const SizedBox(height: AppSpacing.md),
 
-                      // Assignee Dropdown (Scoped to Department Employees)
+                      // Assignee Dropdown (Strictly Scoped to Department Employees with Roles)
                       Text(
-                        'Assign To Employee *',
+                        'Assign To Department Employee *',
                         style: AppTypography.labelMd(
                           color: isDark ? AppColors.darkOnSurface : AppColors.primary,
                           fontWeight: FontWeight.w600,
@@ -166,10 +219,11 @@ class _AssignTaskDialogState extends State<AssignTaskDialog> {
                         final employees = controller.departmentEmployees;
                         return DropdownButtonFormField<String>(
                           initialValue: _selectedAssigneeId,
+                          isExpanded: true,
                           hint: Text(
                             employees.isEmpty
-                                ? 'No employees available in department'
-                                : 'Select department employee...',
+                                ? 'No employees found in ${controller.departmentName.value}'
+                                : 'Select ${controller.departmentName.value} team member...',
                             style: AppTypography.bodyMd(color: AppColors.outline),
                           ),
                           style: AppTypography.bodyMd(
@@ -180,17 +234,56 @@ class _AssignTaskDialogState extends State<AssignTaskDialog> {
                             contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                           ),
                           items: employees.map((emp) {
-                            final name = emp['name'] ?? emp['fullName'] ?? emp['email'] ?? 'Employee';
-                            final designation = emp['designation'] ?? emp['assignedRoleLabel'] ?? '';
+                            final name = (emp['fullName'] ?? emp['name'] ?? emp['email'] ?? 'Employee').toString();
+                            final designation = (emp['designation'] ?? emp['assignedRoleLabel'] ?? emp['role'] ?? 'Member').toString();
+                            final empId = (emp['id'] ?? emp['_id'] ?? '').toString();
+
                             return DropdownMenuItem<String>(
-                              value: emp['id'] ?? emp['_id'] ?? '',
-                              child: Text(
-                                designation.isNotEmpty ? '$name ($designation)' : name.toString(),
-                                overflow: TextOverflow.ellipsis,
+                              value: empId,
+                              child: Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 12,
+                                    backgroundColor: AppColors.primaryContainer,
+                                    child: Text(
+                                      name.isNotEmpty ? name[0].toUpperCase() : 'E',
+                                      style: AppTypography.labelSm(color: AppColors.onPrimaryContainer).copyWith(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: RichText(
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      text: TextSpan(
+                                        style: AppTypography.bodyMd(
+                                          color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                                        ),
+                                        children: [
+                                          TextSpan(
+                                            text: name,
+                                            style: const TextStyle(fontWeight: FontWeight.w600),
+                                          ),
+                                          TextSpan(
+                                            text: '  •  $designation',
+                                            style: const TextStyle(
+                                              color: AppColors.secondary,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             );
                           }).toList(),
-                          validator: (v) => (v == null || v.isEmpty) ? 'Please select an employee' : null,
+                          validator: (v) => (v == null || v.isEmpty) ? 'Please select a department employee' : null,
                           onChanged: (val) {
                             setState(() => _selectedAssigneeId = val);
                           },
@@ -321,6 +414,19 @@ class _AssignTaskDialogState extends State<AssignTaskDialog> {
                           contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                         ),
                       ),
+
+                      const SizedBox(height: AppSpacing.md),
+
+                      // File Upload Attachment Section (Matching Super Admin)
+                      Text(
+                        'ATTACH FILE (Optional)',
+                        style: AppTypography.labelMd(
+                          color: isDark ? AppColors.darkOnSurface : AppColors.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+                      _buildFileUploadArea(isDark),
                     ],
                   ),
                 ),
@@ -366,6 +472,7 @@ class _AssignTaskDialogState extends State<AssignTaskDialog> {
                                   assigneeId: _selectedAssigneeId!,
                                   priority: _selectedPriority,
                                   dueDate: _selectedDueDate,
+                                  attachedFile: _attachedFile,
                                 );
                                 if (success) {
                                   Get.back();
@@ -385,6 +492,100 @@ class _AssignTaskDialogState extends State<AssignTaskDialog> {
                 ],
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFileUploadArea(bool isDark) {
+    if (_attachedFile != null) {
+      final double sizeInMb = _attachedFile!.size / (1024 * 1024);
+      final sizeStr = sizeInMb >= 1.0
+          ? '${sizeInMb.toStringAsFixed(1)} MB'
+          : '${(_attachedFile!.size / 1024).toStringAsFixed(0)} KB';
+
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          border: Border.all(color: AppColors.secondary, width: 1.5),
+          borderRadius: AppRadius.borderMd,
+          color: isDark ? AppColors.darkSurfaceContainer : AppColors.surfaceContainerLowest,
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.insert_drive_file_outlined, color: AppColors.secondary, size: 22),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _attachedFile!.name,
+                    style: AppTypography.bodyMd(
+                      color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    sizeStr,
+                    style: AppTypography.labelSm(color: AppColors.outline),
+                  ),
+                ],
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.close, size: 18, color: AppColors.outline),
+              tooltip: 'Remove File',
+              splashRadius: 18,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              onPressed: () {
+                setState(() {
+                  _attachedFile = null;
+                });
+              },
+            ),
+          ],
+        ),
+      );
+    }
+
+    return GestureDetector(
+      onTap: _pickFile,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: isDark ? Colors.white.withValues(alpha: 0.12) : AppColors.outlineVariant.withValues(alpha: 0.6),
+          ),
+          borderRadius: AppRadius.borderMd,
+          color: isDark ? AppColors.darkSurfaceContainer : AppColors.surfaceContainerLow,
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.cloud_upload_outlined, color: AppColors.secondary, size: 22),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Upload task attachment or reference document',
+                    style: AppTypography.bodyMd(
+                      color: isDark ? AppColors.darkOnSurface : AppColors.onSurface,
+                    ),
+                  ),
+                  Text(
+                    'Supports PDF, ZIP, PNG, JPG, DOCX, XLSX (Max 50MB)',
+                    style: AppTypography.labelSm(color: AppColors.outline),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.attach_file, color: AppColors.outline, size: 18),
           ],
         ),
       ),

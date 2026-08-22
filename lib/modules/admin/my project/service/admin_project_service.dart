@@ -1,4 +1,7 @@
-import 'package:get/get.dart';
+import 'package:dio/dio.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
+import 'package:get/get.dart' hide FormData, MultipartFile;
 import 'package:tms/core/constants/api_endpoints.dart';
 import 'package:tms/core/network/api_client.dart';
 import 'package:tms/modules/admin/my%20project/models/admin_project_model.dart';
@@ -122,5 +125,55 @@ class AdminProjectService {
     }
 
     throw Exception(response.data?['message'] ?? 'Failed to create task');
+  }
+
+  /// Assign task with optional file attachment uploaded to Cloudinary & persisted in MongoDB
+  Future<Map<String, dynamic>> assignTaskWithAttachment({
+    required String projectId,
+    required Map<String, dynamic> taskData,
+    PlatformFile? attachedFile,
+  }) async {
+    final payload = <String, dynamic>{
+      ...taskData,
+      'project': projectId,
+    };
+
+    if (attachedFile != null) {
+      final formData = FormData.fromMap(payload);
+
+      if (kIsWeb && attachedFile.bytes != null) {
+        formData.files.add(MapEntry(
+          'file',
+          MultipartFile.fromBytes(
+            attachedFile.bytes!,
+            filename: attachedFile.name,
+          ),
+        ));
+      } else if (attachedFile.path != null) {
+        formData.files.add(MapEntry(
+          'file',
+          await MultipartFile.fromFile(
+            attachedFile.path!,
+            filename: attachedFile.name,
+          ),
+        ));
+      }
+
+      final response = await _api.dio.post(
+        ApiEndpoints.tasks,
+        data: formData,
+        options: Options(
+          headers: {'Content-Type': 'multipart/form-data'},
+        ),
+      );
+
+      if (response.data != null && response.data['data'] != null) {
+        return Map<String, dynamic>.from(response.data['data']);
+      }
+
+      throw Exception(response.data?['message'] ?? 'Failed to create task with attachment');
+    } else {
+      return createTask(payload);
+    }
   }
 }

@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tms/core/services/storage_service.dart';
@@ -99,13 +100,50 @@ class AdminProjectController extends GetxController {
     }
   }
 
-  /// Fetch department employees dynamically from the API
+  /// Fetch department employees dynamically from the API strictly scoped by department
   Future<void> fetchDepartmentEmployees() async {
     try {
+      final deptId = departmentId.value.trim();
       final employees = await _service.fetchDepartmentEmployees(
-        departmentId: departmentId.value.isNotEmpty ? departmentId.value : null,
+        departmentId: deptId.isNotEmpty ? deptId : null,
       );
-      departmentEmployees.assignAll(employees);
+
+      // Strict department filtering ensuring no cross-department employees appear
+      final filteredList = employees.where((emp) {
+        // Exclude Super Admins from task assignment
+        final sRole = (emp['systemRole'] ?? emp['role'] ?? '').toString().toUpperCase();
+        if (sRole == 'SUPER_ADMIN' || sRole == 'SUPERADMIN') return false;
+
+        if (deptId.isNotEmpty) {
+          final empDept = emp['department'];
+          String? empDeptId;
+          String? empDeptName;
+          if (empDept is Map) {
+            empDeptId = (empDept['_id'] ?? empDept['id'])?.toString();
+            empDeptName = (empDept['name'] ?? empDept['code'])?.toString();
+          } else if (empDept != null) {
+            empDeptId = empDept.toString();
+          }
+          if (emp['departmentId'] != null) {
+            empDeptId = emp['departmentId'].toString();
+          }
+          if (emp['departmentName'] != null) {
+            empDeptName = emp['departmentName'].toString();
+          }
+
+          final currentDeptName = departmentName.value.trim().toLowerCase();
+          final matchesId = empDeptId != null && empDeptId.toLowerCase() == deptId.toLowerCase();
+          final matchesName = empDeptName != null && empDeptName.toLowerCase() == currentDeptName;
+
+          if (!matchesId && !matchesName) {
+            return false;
+          }
+        }
+
+        return true;
+      }).toList();
+
+      departmentEmployees.assignAll(filteredList);
     } catch (_) {}
   }
 
@@ -215,7 +253,7 @@ class AdminProjectController extends GetxController {
     }
   }
 
-  /// Assign a new task to an employee in this project
+  /// Assign a new task to an employee in this project with optional file attachment
   Future<bool> assignTaskToEmployee({
     required String projectId,
     required String title,
@@ -223,6 +261,7 @@ class AdminProjectController extends GetxController {
     required String assigneeId,
     String? priority,
     DateTime? dueDate,
+    PlatformFile? attachedFile,
   }) async {
     isSubmitting.value = true;
     try {
@@ -232,18 +271,37 @@ class AdminProjectController extends GetxController {
         'assignee': assigneeId,
         'priority': (priority ?? 'medium').toLowerCase(),
         'status': 'todo',
+        if (departmentId.value.isNotEmpty) 'department': departmentId.value,
         if (description != null && description.trim().isNotEmpty) 'description': description.trim(),
         if (dueDate != null) 'dueDate': dueDate.toIso8601String(),
       };
 
-      await _service.createTask(payload);
+      await _service.assignTaskWithAttachment(
+        projectId: projectId,
+        taskData: payload,
+        attachedFile: attachedFile,
+      );
 
-      // Increment tasksCount in reactive project list
+      // Increment tasksCount & append deliverable in reactive project list
       final index = projects.indexWhere((p) => p.id == projectId);
       if (index != -1) {
         final p = projects[index];
         final updatedCount = p.tasksCount + 1;
         final updatedRatio = '${p.completedTasksCount}/$updatedCount';
+
+        final updatedDeliverables = List<AdminDeliverableModel>.from(p.deliverables);
+        if (attachedFile != null) {
+          updatedDeliverables.add(
+            AdminDeliverableModel(
+              id: 'local_${DateTime.now().millisecondsSinceEpoch}',
+              fileName: attachedFile.name,
+              filePath: attachedFile.name,
+              notes: 'Task: ${title.trim()}',
+              submittedAt: DateTime.now(),
+            ),
+          );
+        }
+
         projects[index] = AdminProjectModel(
           id: p.id,
           name: p.name,
@@ -262,14 +320,14 @@ class AdminProjectController extends GetxController {
           tasksCount: updatedCount,
           completedTasksCount: p.completedTasksCount,
           tasksRatio: updatedRatio,
-          deliverables: p.deliverables,
+          deliverables: updatedDeliverables,
           members: p.members,
         );
       }
 
       Get.snackbar(
         'Task Assigned',
-        'Task "$title" assigned successfully.',
+        'Task "$title" ${attachedFile != null ? 'with attachment ' : ''}assigned successfully.',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: const Color(0xFF16A34A).withValues(alpha: 0.9),
         colorText: Colors.white,

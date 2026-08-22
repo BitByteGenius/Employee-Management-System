@@ -5,7 +5,7 @@ import 'package:tms/core/routes/app_pages.dart';
 import 'package:tms/modules/admin/dashboard/controllers/admin_shell_controller.dart';
 import 'package:tms/modules/admin/dashboard/views/admin_dashboard_view.dart';
 import 'package:tms/modules/admin/dashboard/views/admin_sidebar.dart';
-import 'package:tms/modules/admin/time%20tracking/view/admin_time_tracking_view.dart';
+import 'package:tms/modules/admin/track%20time/view/admin_time_tracking_view.dart';
 import 'package:tms/modules/admin/work%20force/view/admin_workforce_view.dart';
 import 'package:tms/modules/admin/my%20project/view/admin_projects.dart';
 import 'package:tms/modules/notification/views/notification_list_view.dart';
