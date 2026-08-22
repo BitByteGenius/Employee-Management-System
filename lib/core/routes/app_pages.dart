@@ -73,6 +73,20 @@ class AppPages {
       binding: AdminDashboardBinding(),
     ),
     GetPage(
+      name: AppRoutes.workforce,
+      page: () => const AdminShellView(
+        initialRoute: AppRoutes.workforce,
+      ),
+      binding: AdminDashboardBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.timeTracking,
+      page: () => const AdminShellView(
+        initialRoute: AppRoutes.timeTracking,
+      ),
+      binding: AdminDashboardBinding(),
+    ),
+    GetPage(
       name: AppRoutes.adminProject,
       page: () => const AdminShellView(
         initialRoute: AppRoutes.adminProject,

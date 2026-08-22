@@ -5,7 +5,12 @@ import 'package:tms/core/routes/app_pages.dart';
 import 'package:tms/modules/admin/dashboard/controllers/admin_shell_controller.dart';
 import 'package:tms/modules/admin/dashboard/views/admin_dashboard_view.dart';
 import 'package:tms/modules/admin/dashboard/views/admin_sidebar.dart';
+import 'package:tms/modules/admin/time%20tracking/view/admin_time_tracking_view.dart';
+import 'package:tms/modules/admin/work%20force/view/admin_workforce_view.dart';
 import 'package:tms/modules/admin/my%20project/view/admin_projects.dart';
+import 'package:tms/modules/notification/views/notification_list_view.dart';
+import 'package:tms/modules/reports/views/reports_view.dart';
+import 'package:tms/shared/widgets/app_top_bar.dart';
 
 class AdminShellView extends StatefulWidget {
   const AdminShellView({
@@ -47,8 +52,10 @@ class _AdminShellViewState extends State<AdminShellView> {
       case AppRoutes.adminDashboard:
         return 0;
       case AppRoutes.workforce:
+      case AppRoutes.accessControl:
         return 1;
       case AppRoutes.timeTracking:
+      case AppRoutes.departments:
         return 2;
       case AppRoutes.adminProject:
         return 3;
@@ -93,26 +100,46 @@ class _AdminShellViewState extends State<AdminShellView> {
               ),
             ),
           Expanded(
-            child: Obx(
-              () {
-                final route = controller.currentRoute.value;
+            child: Column(
+              children: [
+                // Stable Persistent AppTopBar across all Admin Screens
+                Obx(
+                  () => AppTopBar(
+                    title: controller.departmentDisplayName.value,
+                    subtitle: controller.screenSubtitle,
+                    userName: controller.userName.value,
+                    userRole: controller.userRoleDisplay.value,
+                    userAvatarUrl: controller.userAvatarUrl.value,
+                    tabs: controller.tabsForCurrentRoute,
+                    selectedTabIndex: controller.selectedTabIndex.value,
+                    onTabSelected: controller.changeTab,
+                    onMenuPressed: !isDesktop ? _openMobileDrawer : null,
+                    onSearchChanged: controller.onSearchChanged,
+                    unreadNotificationsCount: controller.unreadNotificationsCount.value,
+                  ),
+                ),
 
-                return IndexedStack(
-                  index: _getPageIndex(route),
-                  children: [
-                    AdminDashboardView(
-                      onMenuPressed: !isDesktop ? _openMobileDrawer : null,
-                    ),
-                     const Center(child: Text('Workforce Access Control View')),
-                     const Center(child: Text('Time Tracking View')),
-                    AdminProjectsView(
-                      onMenuPressed: !isDesktop ? _openMobileDrawer : null,
-                    ),
-                     const Center(child: Text('Notifications View')),
-                     const Center(child: Text('Reports View')),
-                  ],
-                );
-              },
+                // Dynamic Canvas with Animated/Indexed Stack
+                Expanded(
+                  child: Obx(
+                    () {
+                      final route = controller.currentRoute.value;
+
+                      return IndexedStack(
+                        index: _getPageIndex(route),
+                        children: const [
+                          AdminDashboardView(),
+                          AdminWorkforceView(),
+                          AdminTimeTrackingView(),
+                          AdminProjectsView(),
+                          NotificationListView(),
+                          ReportsView(),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
         ],

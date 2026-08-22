@@ -9,7 +9,6 @@ import 'package:tms/modules/admin/my%20project/view/widget/dashed_border_painter
 import 'package:tms/modules/admin/my%20project/view/widget/filter_project_dialog.dart';
 import 'package:tms/modules/admin/my%20project/view/widget/request_project_dialog.dart';
 import 'package:tms/shared/widgets/app_state_widgets.dart';
-import 'package:tms/shared/widgets/app_top_bar.dart';
 
 class AdminProjectsView extends StatelessWidget {
   const AdminProjectsView({
@@ -21,7 +20,6 @@ class AdminProjectsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // Ensure AdminProjectController is registered
@@ -30,81 +28,52 @@ class AdminProjectsView extends StatelessWidget {
       permanent: false,
     );
 
-    return Scaffold(
-      key: scaffoldKey,
-      backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
-      body: Column(
-        children: [
-          // Top Navigation Bar
-          Obx(
-            () => AppTopBar(
-              title: controller.departmentName.value,
-              subtitle: 'Department Admin',
-              userName: controller.userName.value,
-              userRole: controller.userRole.value,
-              tabs: const ['Overview', 'Projects', 'Team'],
-              selectedTabIndex: 1,
-              onTabSelected: (index) {
-                if (index == 0) {
-                  // Switch to Overview/Dashboard
-                }
-              },
-              onMenuPressed: onMenuPressed ?? () => scaffoldKey.currentState?.openDrawer(),
-            ),
+    return Obx(() {
+      if (controller.isLoading.value && controller.projects.isEmpty) {
+        return const Padding(
+          padding: EdgeInsets.all(AppSpacing.xl),
+          child: Column(
+            children: [
+              AppLoadingSkeleton(height: 80),
+              SizedBox(height: AppSpacing.lg),
+              AppLoadingSkeleton(height: 280),
+            ],
           ),
+        );
+      }
 
-          // Main Screen Body
-          Expanded(
-            child: Obx(() {
-              if (controller.isLoading.value && controller.projects.isEmpty) {
-                return const Padding(
-                  padding: EdgeInsets.all(AppSpacing.xl),
-                  child: Column(
-                    children: [
-                      AppLoadingSkeleton(height: 80),
-                      SizedBox(height: AppSpacing.lg),
-                      AppLoadingSkeleton(height: 280),
-                    ],
-                  ),
-                );
-              }
+      if (controller.hasError.value && controller.projects.isEmpty) {
+        return AppErrorStateWidget(
+          errorMessage: controller.errorMessage.value,
+          onRetry: () => controller.fetchProjects(),
+        );
+      }
 
-              if (controller.hasError.value && controller.projects.isEmpty) {
-                return AppErrorStateWidget(
-                  errorMessage: controller.errorMessage.value,
-                  onRetry: () => controller.fetchProjects(),
-                );
-              }
+      final filtered = controller.filteredProjects;
 
-              final filtered = controller.filteredProjects;
+      return RefreshIndicator(
+        onRefresh: () async {
+          await controller.fetchProjects();
+          await controller.fetchDepartmentEmployees();
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header Section: "My Projects" + Subtitle & Top Right Filter Button
+              _buildHeader(context, isDark, controller),
 
-              return RefreshIndicator(
-                onRefresh: () async {
-                  await controller.fetchProjects();
-                  await controller.fetchDepartmentEmployees();
-                },
-                child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.all(AppSpacing.xl),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Header Section: "My Projects" + Subtitle & Top Right Filter Button
-                      _buildHeader(context, isDark, controller),
+              const SizedBox(height: AppSpacing.xl),
 
-                      const SizedBox(height: AppSpacing.xl),
-
-                      // Projects Grid + "Request New Project" Dashed Card
-                      _buildProjectsGrid(context, isDark, controller, filtered),
-                    ],
-                  ),
-                ),
-              );
-            }),
+              // Projects Grid + "Request New Project" Dashed Card
+              _buildProjectsGrid(context, isDark, controller, filtered),
+            ],
           ),
-        ],
-      ),
-    );
+        ),
+      );
+    });
   }
 
   Widget _buildHeader(BuildContext context, bool isDark, AdminProjectController controller) {

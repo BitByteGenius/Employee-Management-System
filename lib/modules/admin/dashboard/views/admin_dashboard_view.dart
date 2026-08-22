@@ -10,7 +10,6 @@ import 'package:tms/shared/widgets/app_data_table.dart';
 import 'package:tms/shared/widgets/app_stat_card.dart';
 import 'package:tms/shared/widgets/app_state_widgets.dart';
 import 'package:tms/shared/widgets/app_status_badge.dart';
-import 'package:tms/shared/widgets/app_top_bar.dart';
 
 class AdminDashboardView extends GetView<AdminDashboardController> {
   const AdminDashboardView({
@@ -22,82 +21,56 @@ class AdminDashboardView extends GetView<AdminDashboardController> {
 
   @override
   Widget build(BuildContext context) {
-    final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Scaffold(
-      key: scaffoldKey,
-      body: Column(
-        children: [
-          // Top Navigation Bar with Tabs
-          Obx(
-            () => AppTopBar(
-              title: controller.departmentName.value,
-              subtitle: 'Department Admin',
-              userName: controller.userName.value,
-              userRole: 'Department Admin',
-              tabs: const ['Overview', 'Team', 'Timeline'],
-              selectedTabIndex: controller.selectedTab.value,
-              onTabSelected: controller.changeTab,
-              onMenuPressed:
-                  onMenuPressed ?? () => scaffoldKey.currentState?.openDrawer(),
-            ),
+    return Obx(() {
+      if (controller.isLoading.value) {
+        return const Padding(
+          padding: EdgeInsets.all(AppSpacing.xl),
+          child: Column(
+            children: [
+              AppLoadingSkeleton(height: 100),
+              SizedBox(height: AppSpacing.md),
+              AppLoadingSkeleton(height: 240),
+            ],
           ),
+        );
+      }
 
-          // Canvas Area
-          Expanded(
-            child: Obx(() {
-              if (controller.isLoading.value) {
-                return const Padding(
-                  padding: EdgeInsets.all(AppSpacing.xl),
-                  child: Column(
-                    children: [
-                      AppLoadingSkeleton(height: 100),
-                      SizedBox(height: AppSpacing.md),
-                      AppLoadingSkeleton(height: 240),
-                    ],
-                  ),
-                );
-              }
+      if (controller.hasError.value &&
+          controller.projectProgressList.isEmpty) {
+        return AppErrorStateWidget(
+          errorMessage: controller.errorMessage.value,
+          onRetry: () => controller.fetchDashboardData(),
+        );
+      }
 
-              if (controller.hasError.value &&
-                  controller.projectProgressList.isEmpty) {
-                return AppErrorStateWidget(
-                  errorMessage: controller.errorMessage.value,
-                  onRetry: () => controller.fetchDashboardData(),
-                );
-              }
+      return RefreshIndicator(
+        onRefresh: () => controller.fetchDashboardData(),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Welcome Banner
+              _buildWelcomeHeader(controller.userName.value, isDark),
+              const SizedBox(height: AppSpacing.xl),
 
-              return RefreshIndicator(
-                onRefresh: () => controller.fetchDashboardData(),
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(AppSpacing.xl),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Welcome Banner
-                      _buildWelcomeHeader(controller.userName.value, isDark),
-                      const SizedBox(height: AppSpacing.xl),
+              // KPI Cards (5 Cards)
+              _buildKPIGrid(context),
+              const SizedBox(height: AppSpacing.xl),
 
-                      // KPI Cards (5 Cards)
-                      _buildKPIGrid(context),
-                      const SizedBox(height: AppSpacing.xl),
+              // Bento Row (Project Progress & Upcoming Deadlines)
+              _buildProgressAndDeadlinesRow(context, isDark),
+              const SizedBox(height: AppSpacing.xl),
 
-                      // Bento Row (Project Progress & Upcoming Deadlines)
-                      _buildProgressAndDeadlinesRow(context, isDark),
-                      const SizedBox(height: AppSpacing.xl),
-
-                      // Team Workload Table
-                      _buildTeamWorkloadTable(isDark),
-                    ],
-                  ),
-                ),
-              );
-            }),
+              // Team Workload Table
+              _buildTeamWorkloadTable(isDark),
+            ],
           ),
-        ],
-      ),
-    );
+        ),
+      );
+    });
   }
 
   Widget _buildWelcomeHeader(String name, bool isDark) {

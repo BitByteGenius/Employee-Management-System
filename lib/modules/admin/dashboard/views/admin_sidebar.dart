@@ -4,6 +4,7 @@ import 'package:tms/core/constants/app_colors.dart';
 import 'package:tms/core/constants/app_sizes.dart';
 import 'package:tms/core/constants/app_typography.dart';
 import 'package:tms/core/routes/app_pages.dart';
+import 'package:tms/modules/admin/dashboard/controllers/admin_shell_controller.dart';
 
 class AdminSidebar extends StatelessWidget {
   const AdminSidebar({
@@ -58,18 +59,18 @@ class AdminSidebar extends StatelessWidget {
                   _buildSectionTitle('MANAGEMENT', isDark),
                   _buildMenuItem(
                     context: context,
-                    icon: Icons.admin_panel_settings_outlined,
-                    selectedIcon: Icons.admin_panel_settings,
+                    icon: Icons.people_outline,
+                    selectedIcon: Icons.people,
                     title: 'Workforce',
-                    route: AppRoutes.accessControl,
+                    route: AppRoutes.workforce,
                     isDark: isDark,
                   ),
                   _buildMenuItem(
                     context: context,
-                    icon: Icons.business_outlined,
-                    selectedIcon: Icons.business,
+                    icon: Icons.access_time_outlined,
+                    selectedIcon: Icons.access_time,
                     title: 'Time Tracking',
-                    route: AppRoutes.departments,
+                    route: AppRoutes.timeTracking,
                     isDark: isDark,
                   ),
                   _buildMenuItem(
@@ -107,6 +108,11 @@ class AdminSidebar extends StatelessWidget {
   }
 
   Widget _buildHeader(BuildContext context, bool isDark) {
+    String roleLabel = 'Department Admin';
+    if (Get.isRegistered<AdminShellController>()) {
+      roleLabel = Get.find<AdminShellController>().userRoleDisplay.value;
+    }
+
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Row(
@@ -140,12 +146,14 @@ class AdminSidebar extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'Department Admin',
+                  roleLabel,
                   style: AppTypography.labelSm(
                     color: isDark
                         ? AppColors.darkOnSurfaceVariant
                         : AppColors.onSurfaceVariant,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
