@@ -5,6 +5,7 @@ import 'package:tms/core/constants/app_sizes.dart';
 import 'package:tms/core/constants/app_typography.dart';
 import 'package:tms/core/routes/app_pages.dart';
 import 'package:tms/modules/admin/dashboard/controllers/admin_dashboard_controller.dart';
+import 'package:tms/modules/admin/dashboard/controllers/admin_shell_controller.dart';
 import 'package:tms/shared/widgets/app_data_table.dart';
 import 'package:tms/shared/widgets/app_stat_card.dart';
 import 'package:tms/shared/widgets/app_state_widgets.dart';
@@ -209,7 +210,13 @@ class AdminDashboardView extends GetView<AdminDashboardController> {
                 ),
               ),
               TextButton(
-                onPressed: () => Get.toNamed(AppRoutes.projects),
+                onPressed: () {
+                  if (Get.isRegistered<AdminShellController>()) {
+                    Get.find<AdminShellController>().setRoute(AppRoutes.adminProject);
+                  } else {
+                    Get.toNamed(AppRoutes.adminProject);
+                  }
+                },
                 child: Text('View All', style: AppTypography.labelMd(color: AppColors.secondary)),
               ),
             ],

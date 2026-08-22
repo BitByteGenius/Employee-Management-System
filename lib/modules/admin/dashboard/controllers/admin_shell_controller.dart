@@ -7,19 +7,25 @@ class AdminShellController extends GetxController {
 
   final routes = <String>[
     AppRoutes.adminDashboard,
-    AppRoutes.accessControl,
-    AppRoutes.departments,
-    AppRoutes.superAdminProject,
+    AppRoutes.workforce,
+    AppRoutes.timeTracking,
+    AppRoutes.adminProject,
     AppRoutes.notifications,
     AppRoutes.reports,
   ];
 
+  int getRouteIndex(String route) {
+    if (route == AppRoutes.adminDashboard) return 0;
+    if (route == AppRoutes.workforce || route == AppRoutes.accessControl) return 1;
+    if (route == AppRoutes.timeTracking || route == AppRoutes.departments) return 2;
+    if (route == AppRoutes.adminProject || route == AppRoutes.superAdminProject || route == '/admin/project' || route == '/admin/projects') return 3;
+    if (route == AppRoutes.notifications) return 4;
+    if (route == AppRoutes.reports) return 5;
+    return 0;
+  }
+
   void setRoute(String route) {
-    final index = routes.indexOf(route);
-    if (index == -1) return;
-
-    if (currentIndex.value == index) return;
-
+    final index = getRouteIndex(route);
     currentRoute.value = route;
     currentIndex.value = index;
   }

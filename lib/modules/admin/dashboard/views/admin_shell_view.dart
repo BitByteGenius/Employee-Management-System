@@ -5,6 +5,7 @@ import 'package:tms/core/routes/app_pages.dart';
 import 'package:tms/modules/admin/dashboard/controllers/admin_shell_controller.dart';
 import 'package:tms/modules/admin/dashboard/views/admin_dashboard_view.dart';
 import 'package:tms/modules/admin/dashboard/views/admin_sidebar.dart';
+import 'package:tms/modules/admin/my%20project/view/admin_projects.dart';
 
 class AdminShellView extends StatefulWidget {
   const AdminShellView({
@@ -45,11 +46,11 @@ class _AdminShellViewState extends State<AdminShellView> {
     switch (route) {
       case AppRoutes.adminDashboard:
         return 0;
-      case AppRoutes.accessControl:
+      case AppRoutes.workforce:
         return 1;
-      case AppRoutes.departments:
+      case AppRoutes.timeTracking:
         return 2;
-      case AppRoutes.superAdminProject:
+      case AppRoutes.adminProject:
         return 3;
       case AppRoutes.notifications:
         return 4;
@@ -102,11 +103,13 @@ class _AdminShellViewState extends State<AdminShellView> {
                     AdminDashboardView(
                       onMenuPressed: !isDesktop ? _openMobileDrawer : null,
                     ),
-                    const Center(child: Text('Access Control View')),
-                    const Center(child: Text('Departments View')),
-                    const Center(child: Text('Projects Overview View')),
-                    const Center(child: Text('Notifications View')),
-                    const Center(child: Text('Reports View')),
+                     const Center(child: Text('Workforce Access Control View')),
+                     const Center(child: Text('Time Tracking View')),
+                    AdminProjectsView(
+                      onMenuPressed: !isDesktop ? _openMobileDrawer : null,
+                    ),
+                     const Center(child: Text('Notifications View')),
+                     const Center(child: Text('Reports View')),
                   ],
                 );
               },

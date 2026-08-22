@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'package:tms/modules/admin/dashboard/bindings/admin_dashboard_binding.dart';
-import 'package:tms/modules/admin/dashboard/views/admin_dashboard_view.dart';
+import 'package:tms/modules/admin/dashboard/views/admin_shell_view.dart';
 import 'package:tms/modules/auth/bindings/auth_binding.dart';
 import 'package:tms/modules/auth/views/login_view.dart';
 import 'package:tms/modules/auth/views/register_view.dart';
@@ -67,7 +67,16 @@ class AppPages {
 
     GetPage(
       name: AppRoutes.adminDashboard,
-      page: () => const AdminDashboardView(),
+      page: () => const AdminShellView(
+        initialRoute: AppRoutes.adminDashboard,
+      ),
+      binding: AdminDashboardBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.adminProject,
+      page: () => const AdminShellView(
+        initialRoute: AppRoutes.adminProject,
+      ),
       binding: AdminDashboardBinding(),
     ),
     

@@ -77,7 +77,7 @@ class AdminSidebar extends StatelessWidget {
                     icon: Icons.work_outline,
                     selectedIcon: Icons.work,
                     title: 'Projects',
-                    route: AppRoutes.superAdminProject,
+                    route: AppRoutes.adminProject,
                     isDark: isDark,
                   ),
                   _buildMenuItem(
@@ -140,7 +140,7 @@ class AdminSidebar extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'Super Admin',
+                  'Department Admin',
                   style: AppTypography.labelSm(
                     color: isDark
                         ? AppColors.darkOnSurfaceVariant
