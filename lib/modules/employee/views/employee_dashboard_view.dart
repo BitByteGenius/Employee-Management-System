@@ -31,7 +31,7 @@ class EmployeeDashboardView extends GetView<EmployeeDashboardController> {
       const AppNavItem(
         label: 'My Projects',
         icon: Icons.account_tree_outlined,
-        route: AppRoutes.projects,
+        route: AppRoutes.employeeProjects,
       ),
       const AppNavItem(
         label: 'My Tasks',

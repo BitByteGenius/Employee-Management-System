@@ -54,6 +54,7 @@ class ApiEndpoints {
   // Modules
   static const String projects = '/projects';
   static const String tasks = '/tasks';
+  static const String timeTracking = '/time-tracking';
   static const String roles = '/roles';
   static const String settings = '/settings';
   static const String auditLogs = '/audit-logs';

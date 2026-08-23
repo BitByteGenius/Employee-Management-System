@@ -47,6 +47,23 @@ class ProjectModel {
     }
   }
 
+  bool get hasFileAttachment => deliverables.any((d) =>
+      (d.filePath != null && d.filePath!.isNotEmpty) ||
+      (d.fileUrl != null && d.fileUrl!.isNotEmpty) ||
+      (d.externalLink != null && d.externalLink!.isNotEmpty));
+
+  DeliverableModel? get primaryDeliverable {
+    if (deliverables.isEmpty) return null;
+    for (final d in deliverables) {
+      if ((d.filePath != null && d.filePath!.isNotEmpty) ||
+          (d.fileUrl != null && d.fileUrl!.isNotEmpty) ||
+          (d.externalLink != null && d.externalLink!.isNotEmpty)) {
+        return d;
+      }
+    }
+    return deliverables.first;
+  }
+
   factory ProjectModel.fromJson(Map<String, dynamic> json) {
     String managerName = '';
     if (json['managerName'] != null) {
@@ -76,12 +93,9 @@ class ProjectModel {
     if (rawDeliverables is List) {
       for (final item in rawDeliverables) {
         if (item is Map<String, dynamic>) {
-          deliverablesList.add(DeliverableModel(
-            filePath: item['filePath']?.toString(),
-            externalLink: item['externalLink']?.toString(),
-            submissionDeadline: item['submissionDate'] != null ? DateTime.tryParse(item['submissionDate'].toString()) : null,
-            notes: item['notes']?.toString(),
-          ));
+          deliverablesList.add(DeliverableModel.fromJson(item));
+        } else if (item is Map) {
+          deliverablesList.add(DeliverableModel.fromJson(Map<String, dynamic>.from(item)));
         }
       }
     }

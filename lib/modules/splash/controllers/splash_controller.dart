@@ -25,7 +25,8 @@ class SplashController extends GetxController {
         return;
       }
 
-      Get.offAllNamed(AppRoutes.dashboardForRole(user['role']?.toString() ?? ''));
+      final roleStr = (user['systemRole'] ?? user['role'] ?? '').toString();
+      Get.offAllNamed(AppRoutes.dashboardForRole(roleStr));
     } catch (_) {
       // A corrupt/expired local session must never trap the user on splash.
       Get.offAllNamed(AppRoutes.login);

@@ -4,141 +4,73 @@ import 'package:tms/core/constants/app_colors.dart';
 import 'package:tms/core/constants/app_sizes.dart';
 import 'package:tms/core/constants/app_typography.dart';
 import 'package:tms/core/routes/app_pages.dart';
-import 'package:tms/modules/admin/controllers/admin_dashboard_controller.dart';
+import 'package:tms/modules/admin/dashboard/controllers/admin_dashboard_controller.dart';
+import 'package:tms/modules/admin/dashboard/controllers/admin_shell_controller.dart';
 import 'package:tms/shared/widgets/app_data_table.dart';
-import 'package:tms/shared/widgets/app_sidebar.dart';
 import 'package:tms/shared/widgets/app_stat_card.dart';
 import 'package:tms/shared/widgets/app_state_widgets.dart';
 import 'package:tms/shared/widgets/app_status_badge.dart';
-import 'package:tms/shared/widgets/app_top_bar.dart';
 
 class AdminDashboardView extends GetView<AdminDashboardController> {
-  const AdminDashboardView({super.key});
+  const AdminDashboardView({
+    super.key,
+    this.onMenuPressed,
+  });
+
+  final VoidCallback? onMenuPressed;
 
   @override
   Widget build(BuildContext context) {
-    final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-    final isDesktop = AppBreakpoints.isDesktop(MediaQuery.sizeOf(context).width);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final navItems = [
-      const AppNavItem(
-        label: 'Dashboard',
-        icon: Icons.dashboard_outlined,
-        route: AppRoutes.adminDashboard,
-        isSelected: true,
-      ),
-      const AppNavItem(
-        label: 'Projects',
-        icon: Icons.account_tree_outlined,
-        route: AppRoutes.projects,
-      ),
-      const AppNavItem(
-        label: 'Workforce',
-        icon: Icons.groups_outlined,
-        route: AppRoutes.departments,
-      ),
-      const AppNavItem(
-        label: 'Time Tracking',
-        icon: Icons.schedule_outlined,
-        route: AppRoutes.tasks,
-      ),
-      const AppNavItem(
-        label: 'Reports',
-        icon: Icons.analytics_outlined,
-        route: AppRoutes.reports,
-      ),
-      const AppNavItem(
-        label: 'Settings',
-        icon: Icons.settings_outlined,
-        route: AppRoutes.profile,
-      ),
-    ];
-
-    final sidebar = AppSidebar(
-      roleTitle: 'TeamOrbit',
-      roleSubtitle: 'Department Management',
-      navItems: navItems,
-      currentRoute: AppRoutes.adminDashboard,
-    );
-
-    return Scaffold(
-      key: scaffoldKey,
-      drawer: !isDesktop ? Drawer(child: sidebar) : null,
-      body: Row(
-        children: [
-          if (isDesktop) sidebar,
-          Expanded(
-            child: Column(
-              children: [
-                // Top Navigation Bar with Tabs
-                Obx(() => AppTopBar(
-                      title: controller.departmentName.value,
-                      subtitle: 'Department Admin',
-                      userName: controller.userName.value,
-                      userRole: 'Department Admin',
-                      tabs: const ['Overview', 'Team', 'Timeline'],
-                      selectedTabIndex: controller.selectedTab.value,
-                      onTabSelected: controller.changeTab,
-                      onMenuPressed: () => scaffoldKey.currentState?.openDrawer(),
-                    )),
-
-                // Canvas Area
-                Expanded(
-                  child: Obx(() {
-                    if (controller.isLoading.value) {
-                      return const Padding(
-                        padding: EdgeInsets.all(AppSpacing.xl),
-                        child: Column(
-                          children: [
-                            AppLoadingSkeleton(height: 100),
-                            SizedBox(height: AppSpacing.md),
-                            AppLoadingSkeleton(height: 240),
-                          ],
-                        ),
-                      );
-                    }
-
-                    if (controller.hasError.value && controller.projectProgressList.isEmpty) {
-                      return AppErrorStateWidget(
-                        errorMessage: controller.errorMessage.value,
-                        onRetry: () => controller.fetchDashboardData(),
-                      );
-                    }
-
-                    return RefreshIndicator(
-                      onRefresh: () => controller.fetchDashboardData(),
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.all(AppSpacing.xl),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Welcome Banner
-                            _buildWelcomeHeader(controller.userName.value, isDark),
-                            const SizedBox(height: AppSpacing.xl),
-
-                            // KPI Cards (5 Cards)
-                            _buildKPIGrid(context),
-                            const SizedBox(height: AppSpacing.xl),
-
-                            // Bento Row (Project Progress & Upcoming Deadlines)
-                            _buildProgressAndDeadlinesRow(context, isDark),
-                            const SizedBox(height: AppSpacing.xl),
-
-                            // Team Workload Table
-                            _buildTeamWorkloadTable(isDark),
-                          ],
-                        ),
-                      ),
-                    );
-                  }),
-                ),
-              ],
-            ),
+    return Obx(() {
+      if (controller.isLoading.value) {
+        return const Padding(
+          padding: EdgeInsets.all(AppSpacing.xl),
+          child: Column(
+            children: [
+              AppLoadingSkeleton(height: 100),
+              SizedBox(height: AppSpacing.md),
+              AppLoadingSkeleton(height: 240),
+            ],
           ),
-        ],
-      ),
-    );
+        );
+      }
+
+      if (controller.hasError.value &&
+          controller.projectProgressList.isEmpty) {
+        return AppErrorStateWidget(
+          errorMessage: controller.errorMessage.value,
+          onRetry: () => controller.fetchDashboardData(),
+        );
+      }
+
+      return RefreshIndicator(
+        onRefresh: () => controller.fetchDashboardData(),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Welcome Banner
+              _buildWelcomeHeader(controller.userName.value, isDark),
+              const SizedBox(height: AppSpacing.xl),
+
+              // KPI Cards (5 Cards)
+              _buildKPIGrid(context),
+              const SizedBox(height: AppSpacing.xl),
+
+              // Bento Row (Project Progress & Upcoming Deadlines)
+              _buildProgressAndDeadlinesRow(context, isDark),
+              const SizedBox(height: AppSpacing.xl),
+
+              // Team Workload Table
+              _buildTeamWorkloadTable(isDark),
+            ],
+          ),
+        ),
+      );
+    });
   }
 
   Widget _buildWelcomeHeader(String name, bool isDark) {
@@ -251,7 +183,13 @@ class AdminDashboardView extends GetView<AdminDashboardController> {
                 ),
               ),
               TextButton(
-                onPressed: () => Get.toNamed(AppRoutes.projects),
+                onPressed: () {
+                  if (Get.isRegistered<AdminShellController>()) {
+                    Get.find<AdminShellController>().setRoute(AppRoutes.adminProject);
+                  } else {
+                    Get.toNamed(AppRoutes.adminProject);
+                  }
+                },
                 child: Text('View All', style: AppTypography.labelMd(color: AppColors.secondary)),
               ),
             ],

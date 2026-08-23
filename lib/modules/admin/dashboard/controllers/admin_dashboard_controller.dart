@@ -19,7 +19,8 @@ class AdminDashboardController extends GetxController {
   final overdueTasksCount = 0.obs;
 
   final userName = 'Admin'.obs;
-  final departmentName = 'Department Management'.obs;
+  final departmentName = 'Department'.obs;
+  final userRole = 'Department Admin'.obs;
 
   // Project progress lists
   final projectProgressList = <Map<String, dynamic>>[].obs;
@@ -41,9 +42,21 @@ class AdminDashboardController extends GetxController {
     if (user != null) {
       final name = user['fullName'] ?? user['name'] ?? 'Admin';
       userName.value = name.toString();
-      if (user['department'] != null) {
-        departmentName.value = user['department'].toString();
+
+      String rawDept = '';
+      if (user['department'] is Map) {
+        final d = user['department'] as Map;
+        rawDept = (d['name'] ?? d['code'] ?? '').toString();
+      } else if (user['departmentName'] != null) {
+        rawDept = user['departmentName'].toString();
+      } else if (user['department'] is String) {
+        rawDept = user['department'].toString();
       }
+
+      if (rawDept.isNotEmpty) {
+        departmentName.value = rawDept;
+      }
+      userRole.value = (user['assignedRoleLabel'] ?? user['systemRole'] ?? 'Department Admin').toString();
     }
   }
 

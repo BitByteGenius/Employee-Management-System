@@ -702,6 +702,24 @@ class AccessControlController extends GetxController {
     );
   }
 
+  Future<bool> assignEmployeeRoleAndDepartment(
+    AccessControlPendingUser user, {
+    required String roleId,
+    required String departmentId,
+  }) async {
+    return _runUserAction(
+      successTitle: 'Assignment Saved',
+      successMessage: 'Role and Department assignment was saved.',
+      request: () => _api.dio.patch(
+        ApiEndpoints.assignUserRole(user.id),
+        data: {
+          'roleId': roleId,
+          'departmentId': departmentId,
+        },
+      ),
+    );
+  }
+
   // ---------------------------------------------------------------------------
   // Export
   // ---------------------------------------------------------------------------

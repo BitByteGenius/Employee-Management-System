@@ -16,11 +16,17 @@ abstract class AppRoutes {
   static const String departments = '/super-admin/departments';
   static const String superAdminProject = '/super-admin/projects';
 
+  //Admin Screens
   static const String adminDashboard = '/admin/dashboard';
+  static const String workforce = '/admin/workforce';
+  static const String timeTracking = '/admin/time-tracking';
+  static const String adminProject = '/admin/project';
+
+  //employee Screen
   static const String employeeDashboard = '/employee/dashboard';
+  static const String employeeProjects = '/employee/Task';
 
   // Core Features
-  static const String projects = '/projects';
   static const String tasks = '/tasks';
   static const String reports = '/reports';
   static const String notifications = '/notifications';
@@ -28,15 +34,14 @@ abstract class AppRoutes {
 
   /// Returns the dashboard route based on the user's role.
   static String dashboardForRole(String role) {
-    switch (role) {
-      case 'super_admin':
-        return superAdminDashboard;
-      case 'admin':
-        return adminDashboard;
-      case 'employee':
-        return employeeDashboard;
-      default:
-        return login;
+    final normalized = role.toLowerCase().trim();
+    if (normalized.contains('super')) {
+      return superAdminDashboard;
+    } else if (normalized.contains('admin')) {
+      return adminDashboard;
+    } else if (normalized.contains('employee')) {
+      return employeeDashboard;
     }
+    return login;
   }
 }
