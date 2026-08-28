@@ -43,6 +43,13 @@ class AppTypography {
         color: color,
       );
 
+  static TextStyle titleMd({Color? color, FontWeight? fontWeight}) => GoogleFonts.inter(
+        fontSize: 16,
+        height: 24 / 16,
+        fontWeight: fontWeight ?? FontWeight.w600,
+        color: color,
+      );
+
   static TextStyle bodyLg({Color? color}) => GoogleFonts.inter(
         fontSize: 16,
         height: 24 / 16,
@@ -72,11 +79,11 @@ class AppTypography {
         color: color,
       );
 
-  static TextStyle labelSm({Color? color}) => GoogleFonts.jetBrainsMono(
+  static TextStyle labelSm({Color? color, FontWeight? fontWeight}) => GoogleFonts.jetBrainsMono(
         fontSize: 10,
         height: 14 / 10,
         letterSpacing: 0.5,
-        fontWeight: FontWeight.w500,
+        fontWeight: fontWeight ?? FontWeight.w500,
         color: color,
       );
 }

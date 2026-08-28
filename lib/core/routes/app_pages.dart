@@ -5,8 +5,8 @@ import 'package:tms/modules/auth/bindings/auth_binding.dart';
 import 'package:tms/modules/auth/views/login_view.dart';
 import 'package:tms/modules/auth/views/register_view.dart';
 import 'package:tms/modules/department/bindings/department_binding.dart';
-import 'package:tms/modules/employee/bindings/employee_dashboard_binding.dart';
-import 'package:tms/modules/employee/views/employee_dashboard_view.dart';
+import 'package:tms/modules/employee/dashboard/bindings/employee_dashboard_binding.dart';
+import 'package:tms/modules/employee/dashboard/views/employee_shell_view.dart';
 import 'package:tms/modules/splash/bindings/splash_binding.dart';
 import 'package:tms/modules/splash/views/splash_view.dart';
 import 'package:tms/modules/super_admin/acces%20controll/bindings/access_control_binding.dart';
@@ -94,9 +94,33 @@ class AppPages {
       binding: AdminDashboardBinding(),
     ),
     
+    // Employee Routes
     GetPage(
       name: AppRoutes.employeeDashboard,
-      page: () => const EmployeeDashboardView(),
+      page: () => const EmployeeShellView(
+        initialRoute: AppRoutes.employeeDashboard,
+      ),
+      binding: EmployeeDashboardBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.employeeTasks,
+      page: () => const EmployeeShellView(
+        initialRoute: AppRoutes.employeeTasks,
+      ),
+      binding: EmployeeDashboardBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.employeeProjects,
+      page: () => const EmployeeShellView(
+        initialRoute: AppRoutes.employeeProjects,
+      ),
+      binding: EmployeeDashboardBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.employeeTimeTracking,
+      page: () => const EmployeeShellView(
+        initialRoute: AppRoutes.employeeTimeTracking,
+      ),
       binding: EmployeeDashboardBinding(),
     ),
   ];
