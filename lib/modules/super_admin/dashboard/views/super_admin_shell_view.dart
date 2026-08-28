@@ -12,6 +12,9 @@ import 'package:tms/modules/super_admin/dashboard/views/super_admin_dashboard_vi
 import 'package:tms/modules/super_admin/dashboard/views/widgets/super_admin_sidebar.dart';
 import 'package:tms/modules/super_admin/projects/view/projects_overview_screen.dart';
 
+import 'package:tms/modules/notification/views/notification_list_view.dart';
+import 'package:tms/modules/reports/views/reports_view.dart';
+
 class SuperAdminShellView extends StatefulWidget {
   const SuperAdminShellView({
     super.key,
@@ -69,6 +72,10 @@ class _SuperAdminShellViewState extends State<SuperAdminShellView> {
         return 2;
       case AppRoutes.superAdminProject:
         return 3;
+      case AppRoutes.notifications:
+        return 4;
+      case AppRoutes.reports:
+        return 5;
       default:
         return 0;
     }
@@ -140,6 +147,16 @@ class _SuperAdminShellViewState extends State<SuperAdminShellView> {
                     ProjectsOverviewScreen(
                       onMenuPressed: !isDesktop ? _openMobileDrawer : null,
                     ),
+
+                    // ==================================================
+                    // 4: Notifications
+                    // ==================================================
+                    const NotificationListView(),
+
+                    // ==================================================
+                    // 5: Reports
+                    // ==================================================
+                    const ReportsView(),
                   ],
                 );
               },

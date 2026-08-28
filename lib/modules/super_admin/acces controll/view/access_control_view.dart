@@ -11,6 +11,8 @@ import 'package:tms/modules/super_admin/acces%20controll/view/widget/access_cont
 import 'package:tms/modules/super_admin/acces%20controll/view/widget/pending_approval_table.dart';
 import 'package:tms/shared/widgets/app_state_widgets.dart';
 import 'package:tms/shared/widgets/app_top_bar.dart';
+import 'package:tms/core/routes/app_pages.dart';
+import 'package:tms/modules/super_admin/dashboard/controllers/super_admin_shell_controller.dart';
 
 class AccessControlView
     extends GetView<AccessControlController> {
@@ -40,6 +42,13 @@ class AccessControlView
           userRole: 'Super Admin',
           onMenuPressed:
               onMenuPressed,
+          onNotificationPressed: () {
+            if (Get.isRegistered<SuperAdminShellController>()) {
+              Get.find<SuperAdminShellController>().setRoute(AppRoutes.notifications);
+            } else {
+              Get.toNamed(AppRoutes.notifications);
+            }
+          },
         ),
 
         // ==========================================================

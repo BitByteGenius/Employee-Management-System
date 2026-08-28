@@ -8,6 +8,8 @@ import 'package:tms/modules/department/models/department_employee_model.dart';
 import 'package:tms/modules/department/models/department_models.dart';
 import 'package:tms/modules/department/views/widget/CreateDepartmentDialog.dart';
 import 'package:tms/shared/widgets/app_top_bar.dart';
+import 'package:tms/core/routes/app_pages.dart';
+import 'package:tms/modules/super_admin/dashboard/controllers/super_admin_shell_controller.dart';
 
 class DepartmentView extends GetView<DepartmentController> {
   const DepartmentView({
@@ -29,9 +31,16 @@ class DepartmentView extends GetView<DepartmentController> {
         AppTopBar(
           title: 'Departments',
           subtitle: 'Organizational Units',
-          userName: 'Admin User',
-          userRole: 'Administrator',
+          userName: 'Super Admin',
+          userRole: 'Super Admin',
           onMenuPressed: onMenuPressed,
+          onNotificationPressed: () {
+            if (Get.isRegistered<SuperAdminShellController>()) {
+              Get.find<SuperAdminShellController>().setRoute(AppRoutes.notifications);
+            } else {
+              Get.toNamed(AppRoutes.notifications);
+            }
+          },
         ),
 
         // ==========================================================

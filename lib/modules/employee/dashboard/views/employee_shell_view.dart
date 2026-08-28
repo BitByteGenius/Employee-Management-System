@@ -109,6 +109,7 @@ class _EmployeeShellViewState extends State<EmployeeShellView> {
                     selectedTabIndex: controller.selectedTab.value,
                     onTabSelected: controller.changeTab,
                     onMenuPressed: !isDesktop ? _openMobileDrawer : null,
+                    onNotificationPressed: () => _handleRouteSelected(AppRoutes.notifications),
                     unreadNotificationsCount: controller.unreadNotificationsCount.value,
                   ),
                 ),

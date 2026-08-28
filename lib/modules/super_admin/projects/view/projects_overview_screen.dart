@@ -9,6 +9,8 @@ import 'package:tms/modules/super_admin/projects/controller/project_controller.d
 import 'package:tms/modules/super_admin/projects/models/project_model.dart';
 import 'package:tms/modules/super_admin/projects/view/widget/create_project_dialog.dart';
 import 'package:tms/shared/widgets/app_top_bar.dart';
+import 'package:tms/core/routes/app_pages.dart';
+import 'package:tms/modules/super_admin/dashboard/controllers/super_admin_shell_controller.dart';
 
 class ProjectsOverviewScreen extends GetView<ProjectController> {
   const ProjectsOverviewScreen({
@@ -33,6 +35,13 @@ class ProjectsOverviewScreen extends GetView<ProjectController> {
           userName: 'Super Admin',
           userRole: 'Super Admin',
           onMenuPressed: onMenuPressed,
+          onNotificationPressed: () {
+            if (Get.isRegistered<SuperAdminShellController>()) {
+              Get.find<SuperAdminShellController>().setRoute(AppRoutes.notifications);
+            } else {
+              Get.toNamed(AppRoutes.notifications);
+            }
+          },
         ),
 
         // ==========================================================

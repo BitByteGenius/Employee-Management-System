@@ -11,6 +11,9 @@ import 'package:tms/shared/widgets/app_state_widgets.dart';
 import 'package:tms/shared/widgets/app_status_badge.dart';
 import 'package:tms/shared/widgets/app_top_bar.dart';
 
+import 'package:tms/core/routes/app_pages.dart';
+import 'package:tms/modules/super_admin/dashboard/controllers/super_admin_shell_controller.dart';
+
 class SuperAdminDashboardView
     extends GetView<SuperAdminDashboardController> {
   const SuperAdminDashboardView({
@@ -36,6 +39,13 @@ class SuperAdminDashboardView
             subtitle: 'Super Admin Overview',
             userName: controller.userName.value,
             userRole: 'Super Admin',
+            onNotificationPressed: () {
+              if (Get.isRegistered<SuperAdminShellController>()) {
+                Get.find<SuperAdminShellController>().setRoute(AppRoutes.notifications);
+              } else {
+                Get.toNamed(AppRoutes.notifications);
+              }
+            },
 
             // Only provided on mobile.
             onMenuPressed: onMenuPressed,

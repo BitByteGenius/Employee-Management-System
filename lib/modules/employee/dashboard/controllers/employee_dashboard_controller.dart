@@ -51,6 +51,17 @@ class EmployeeDashboardController extends GetxController {
     _loadUserInfo();
     fetchDashboardData();
     _fetchProfileBackground();
+    fetchUnreadNotificationsCount();
+  }
+
+  Future<void> fetchUnreadNotificationsCount() async {
+    try {
+      final res = await _api.get<Map<String, dynamic>>(ApiEndpoints.unreadNotificationsCount);
+      if (res.data != null && res.data!['success'] == true) {
+        final count = res.data!['count'] ?? res.data!['data']?['count'] ?? 0;
+        unreadNotificationsCount.value = count is int ? count : int.tryParse(count.toString()) ?? 0;
+      }
+    } catch (_) {}
   }
 
   void setRoute(String route) {

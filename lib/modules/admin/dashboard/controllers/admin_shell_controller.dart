@@ -39,6 +39,20 @@ class AdminShellController extends GetxController {
     super.onInit();
     loadSessionInfo();
     refreshProfileFromApi();
+    fetchUnreadNotificationsCount();
+  }
+
+  /// Fetches unread notifications count from backend API
+  Future<void> fetchUnreadNotificationsCount() async {
+    try {
+      if (!Get.isRegistered<ApiClient>()) return;
+      final api = Get.find<ApiClient>();
+      final res = await api.get<Map<String, dynamic>>(ApiEndpoints.unreadNotificationsCount);
+      if (res.data != null && res.data!['success'] == true) {
+        final count = res.data!['count'] ?? res.data!['data']?['count'] ?? 0;
+        unreadNotificationsCount.value = count is int ? count : int.tryParse(count.toString()) ?? 0;
+      }
+    } catch (_) {}
   }
 
   /// Capitalize words and preserve known acronyms like HR, IT
