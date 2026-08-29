@@ -6,6 +6,7 @@ import 'package:tms/core/constants/app_sizes.dart';
 import 'package:tms/core/constants/app_typography.dart';
 import 'package:tms/modules/department/controllers/department_controller.dart';
 import 'package:tms/modules/department/models/department_employee_model.dart';
+import 'package:tms/shared/widgets/app_user_avatar.dart';
 
 class CreateDepartmentDialog extends StatefulWidget {
   const CreateDepartmentDialog({super.key});
@@ -206,18 +207,10 @@ class _CreateDepartmentDialogState extends State<CreateDepartmentDialog> {
                           final candidate = controller.adminCandidates[index];
                           return ListTile(
                             dense: true,
-                            leading: CircleAvatar(
+                            leading: AppUserAvatar(
+                              imageUrl: candidate.profilePicture,
+                              name: candidate.name,
                               radius: 14,
-                              backgroundColor: AppColors.primaryContainer,
-                              backgroundImage: candidate.profilePicture != null
-                                  ? NetworkImage(candidate.profilePicture!)
-                                  : null,
-                              child: candidate.profilePicture == null
-                                  ? Text(
-                                      candidate.name.isNotEmpty ? candidate.name[0].toUpperCase() : 'U',
-                                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                                    )
-                                  : null,
                             ),
                             title: Text(
                               candidate.name,

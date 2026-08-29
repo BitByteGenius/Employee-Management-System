@@ -19,6 +19,7 @@ class AdminDashboardController extends GetxController {
   final overdueTasksCount = 0.obs;
 
   final userName = 'Admin'.obs;
+  final userAvatarUrl = ''.obs;
   final departmentName = 'Department'.obs;
   final userRole = 'Department Admin'.obs;
 
@@ -42,6 +43,7 @@ class AdminDashboardController extends GetxController {
     if (user != null) {
       final name = user['fullName'] ?? user['name'] ?? 'Admin';
       userName.value = name.toString();
+      userAvatarUrl.value = (user['profilePicture'] ?? user['avatar'] ?? '').toString();
 
       String rawDept = '';
       if (user['department'] is Map) {

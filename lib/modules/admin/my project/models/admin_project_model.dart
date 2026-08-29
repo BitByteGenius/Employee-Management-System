@@ -90,6 +90,7 @@ class AdminProjectModel {
   final DateTime? createdAt;
   final String? managerName;
   final String? managerId;
+  final String? managerAvatar;
   final String? departmentName;
   final String? departmentId;
   final int tasksCount;
@@ -111,6 +112,7 @@ class AdminProjectModel {
     this.createdAt,
     this.managerName,
     this.managerId,
+    this.managerAvatar,
     this.departmentName,
     this.departmentId,
     this.tasksCount = 0,
@@ -254,6 +256,7 @@ class AdminProjectModel {
   factory AdminProjectModel.fromJson(Map<String, dynamic> json) {
     String managerName = '';
     String managerId = '';
+    String? managerAvatar;
 
     if (json['managerName'] != null) {
       managerName = json['managerName'].toString();
@@ -261,11 +264,13 @@ class AdminProjectModel {
       final m = json['manager'] as Map;
       managerId = (m['_id'] ?? m['id'] ?? '').toString();
       managerName = (m['fullName'] ?? '${m['firstName'] ?? ''} ${m['lastName'] ?? ''}'.trim()).toString();
+      managerAvatar = (m['profilePicture'] ?? m['avatar'])?.toString();
       if (managerName.isEmpty && m['email'] != null) managerName = m['email'].toString();
     } else if (json['owner'] is Map) {
       final o = json['owner'] as Map;
       managerId = (o['_id'] ?? o['id'] ?? '').toString();
       managerName = (o['fullName'] ?? '${o['firstName'] ?? ''} ${o['lastName'] ?? ''}'.trim()).toString();
+      managerAvatar = (o['profilePicture'] ?? o['avatar'])?.toString();
     }
 
     String departmentName = '';
@@ -312,6 +317,7 @@ class AdminProjectModel {
       createdAt: json['createdAt'] != null ? DateTime.tryParse(json['createdAt'].toString()) : null,
       managerName: managerName.isNotEmpty ? managerName : null,
       managerId: managerId.isNotEmpty ? managerId : null,
+      managerAvatar: managerAvatar,
       departmentName: departmentName.isNotEmpty ? departmentName : null,
       departmentId: departmentId.isNotEmpty ? departmentId : null,
       tasksCount: totalTasks,

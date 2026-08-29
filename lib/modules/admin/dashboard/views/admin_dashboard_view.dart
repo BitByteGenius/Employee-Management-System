@@ -10,6 +10,7 @@ import 'package:tms/shared/widgets/app_data_table.dart';
 import 'package:tms/shared/widgets/app_stat_card.dart';
 import 'package:tms/shared/widgets/app_state_widgets.dart';
 import 'package:tms/shared/widgets/app_status_badge.dart';
+import 'package:tms/shared/widgets/app_user_avatar.dart';
 
 class AdminDashboardView extends GetView<AdminDashboardController> {
   const AdminDashboardView({
@@ -353,13 +354,10 @@ class AdminDashboardView extends GetView<AdminDashboardController> {
         return [
           Row(
             children: [
-              CircleAvatar(
+              AppUserAvatar(
+                imageUrl: (m['avatar'] ?? m['profilePicture'])?.toString(),
+                name: (m['name'] ?? 'User').toString(),
                 radius: 14,
-                backgroundColor: AppColors.primaryContainer,
-                child: Text(
-                  m['initials'] ?? 'U',
-                  style: AppTypography.labelSm(color: AppColors.onPrimaryContainer),
-                ),
               ),
               const SizedBox(width: AppSpacing.sm),
               Text(

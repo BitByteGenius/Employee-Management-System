@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_typography.dart';
+import '../../../shared/widgets/app_user_avatar.dart';
 import '../models/activity_model.dart';
 
 class RecentActivityCard extends StatelessWidget {
@@ -98,23 +99,15 @@ class RecentActivityCard extends StatelessWidget {
                     // Timeline Avatar column
                     Column(
                       children: [
-                        CircleAvatar(
+                        AppUserAvatar(
+                          imageUrl: activity.actorAvatar,
+                          name: activity.actorName,
                           radius: 12,
                           backgroundColor: isDark
                               ? const Color(0xFF2D3748)
                               : const Color(0xFFE5E7EB),
-                          backgroundImage: (activity.actorAvatar != null && activity.actorAvatar!.isNotEmpty)
-                              ? NetworkImage(activity.actorAvatar!)
-                              : null,
-                          child: (activity.actorAvatar == null || activity.actorAvatar!.isEmpty)
-                              ? Text(
-                                  activity.actorInitials,
-                                  style: AppTypography.labelSm(
-                                    color: isDark ? AppColors.darkOnSurface : const Color(0xFF4B5563),
-                                    fontWeight: FontWeight.w600,
-                                  ).copyWith(fontSize: 9),
-                                )
-                              : null,
+                          textColor: isDark ? AppColors.darkOnSurface : const Color(0xFF4B5563),
+                          fontSize: 9,
                         ),
                         if (!isLast)
                           Container(

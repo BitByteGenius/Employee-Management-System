@@ -11,6 +11,7 @@ import 'package:tms/modules/super_admin/acces%20controll/view/widget/access_cont
 import 'package:tms/modules/super_admin/acces%20controll/view/widget/pending_approval_table.dart';
 import 'package:tms/shared/widgets/app_state_widgets.dart';
 import 'package:tms/shared/widgets/app_top_bar.dart';
+import 'package:tms/shared/widgets/app_user_avatar.dart';
 import 'package:tms/core/routes/app_pages.dart';
 import 'package:tms/modules/super_admin/dashboard/controllers/super_admin_shell_controller.dart';
 
@@ -466,16 +467,12 @@ class _DeleteUserIdentity extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        CircleAvatar(
+        AppUserAvatar(
+          imageUrl: user.profilePicture,
+          name: user.fullName,
           radius: 18,
           backgroundColor: AppColors.error,
-          child: Text(
-            user.initials,
-            style: AppTypography.labelMd(
-              color: Colors.white,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
+          textColor: Colors.white,
         ),
         const SizedBox(width: AppSpacing.sm),
         Expanded(

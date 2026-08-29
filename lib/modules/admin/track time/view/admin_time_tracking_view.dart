@@ -9,6 +9,7 @@ import 'package:tms/shared/widgets/app_data_table.dart';
 import 'package:tms/shared/widgets/app_stat_card.dart';
 import 'package:tms/shared/widgets/app_state_widgets.dart';
 import 'package:tms/shared/widgets/app_status_badge.dart';
+import 'package:tms/shared/widgets/app_user_avatar.dart';
 
 class AdminTimeTrackingView extends StatefulWidget {
   const AdminTimeTrackingView({super.key});
@@ -168,13 +169,10 @@ class _AdminTimeTrackingViewState extends State<AdminTimeTrackingView> {
                   return [
                     Row(
                       children: [
-                        CircleAvatar(
+                        AppUserAvatar(
+                          imageUrl: (log['avatar'] ?? log['profilePicture'])?.toString(),
+                          name: name,
                           radius: 13,
-                          backgroundColor: AppColors.primaryContainer,
-                          child: Text(
-                            name.isNotEmpty ? name[0].toUpperCase() : 'M',
-                            style: AppTypography.labelSm(color: AppColors.onPrimaryContainer),
-                          ),
                         ),
                         const SizedBox(width: 8),
                         Flexible(

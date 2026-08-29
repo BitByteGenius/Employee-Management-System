@@ -7,6 +7,7 @@ import 'package:tms/modules/super_admin/acces%20controll/controller/access_contr
 import 'package:tms/modules/super_admin/acces%20controll/models/access_control_pending_user.dart';
 import 'package:tms/modules/super_admin/acces%20controll/view/widget/access_control_dialogs.dart';
 import 'package:tms/shared/widgets/app_state_widgets.dart';
+import 'package:tms/shared/widgets/app_user_avatar.dart';
 
 // ============================================================================
 // Main Table Widget
@@ -457,17 +458,11 @@ class _UserIdentity extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        CircleAvatar(
+        AppUserAvatar(
+          imageUrl: user.profilePicture,
+          name: user.fullName,
           radius: 17,
           backgroundColor: avatarColor,
-          child: Text(
-            user.initials,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
         ),
         const SizedBox(width: AppSpacing.sm + 2),
         Expanded(

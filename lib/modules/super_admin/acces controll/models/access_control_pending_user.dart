@@ -12,6 +12,7 @@ class AccessControlPendingUser {
     this.department,
     this.departmentId,
     this.departmentName,
+    this.profilePicture,
     this.initials = 'U',
   });
 
@@ -27,6 +28,7 @@ class AccessControlPendingUser {
   final dynamic department;
   final String? departmentId;
   final String? departmentName;
+  final String? profilePicture;
   final String initials;
 
   /// Backward-compatible role accessor returning the system role
@@ -136,6 +138,7 @@ class AccessControlPendingUser {
       department: deptVal,
       departmentId: deptId,
       departmentName: deptName,
+      profilePicture: (json['profilePicture'] ?? json['avatar'])?.toString(),
       initials: initials,
     );
   }

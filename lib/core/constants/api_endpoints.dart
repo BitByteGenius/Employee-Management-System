@@ -11,12 +11,14 @@ class ApiEndpoints {
     return 'http://localhost:5000/api/v1';
   }
 
-  // Auth
+  // Auth & Profile
   static const String register = '/auth/register';
   static const String login = '/auth/login';
   static const String refreshToken = '/auth/refresh-token';
   static const String logout = '/auth/logout';
   static const String me = '/auth/me';
+  static const String profile = '/users/profile';
+  static const String profilePicture = '/users/profile/picture';
 
   // ==========================================================================
   // DEPARTMENTS

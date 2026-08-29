@@ -5,6 +5,7 @@ import 'package:tms/core/constants/app_sizes.dart';
 import 'package:tms/core/constants/app_typography.dart';
 import 'package:tms/core/routes/app_pages.dart';
 import 'package:tms/modules/employee/dashboard/controllers/employee_dashboard_controller.dart';
+import 'package:tms/modules/profile/views/profile_dialog.dart';
 
 class EmployeeSidebar extends StatelessWidget {
   const EmployeeSidebar({
@@ -99,46 +100,50 @@ class EmployeeSidebar extends StatelessWidget {
       designation = Get.find<EmployeeDashboardController>().userRoleDisplay.value;
     }
 
-    return Padding(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Row(
-        children: [
-          Container(
-            width: 42,
-            height: 42,
-            decoration: const BoxDecoration(
-              color: AppColors.secondary,
-              borderRadius: AppRadius.borderMd,
+    return InkWell(
+      onTap: () => ProfileDialog.show(context),
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Row(
+          children: [
+            Container(
+              width: 42,
+              height: 42,
+              decoration: const BoxDecoration(
+                color: AppColors.secondary,
+                borderRadius: AppRadius.borderMd,
+              ),
+              child: const Icon(
+                Icons.badge_outlined,
+                color: Colors.white,
+                size: 24,
+              ),
             ),
-            child: const Icon(
-              Icons.badge_outlined,
-              color: Colors.white,
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'TMS',
-                  style: AppTypography.titleLg(
-                    color: isDark ? AppColors.darkOnSurface : AppColors.primary,
-                  ).copyWith(fontWeight: FontWeight.w800),
-                ),
-                Text(
-                  designation,
-                  style: AppTypography.labelSm(
-                    color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'TMS',
+                    style: AppTypography.titleLg(
+                      color: isDark ? AppColors.darkOnSurface : AppColors.primary,
+                    ).copyWith(fontWeight: FontWeight.w800),
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+                  Text(
+                    '$designation (Edit Profile)',
+                    style: AppTypography.labelSm(
+                      color: isDark ? AppColors.darkOnSurfaceVariant : AppColors.onSurfaceVariant,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

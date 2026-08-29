@@ -9,6 +9,7 @@ import 'package:tms/shared/widgets/app_data_table.dart';
 import 'package:tms/shared/widgets/app_stat_card.dart';
 import 'package:tms/shared/widgets/app_state_widgets.dart';
 import 'package:tms/shared/widgets/app_status_badge.dart';
+import 'package:tms/shared/widgets/app_user_avatar.dart';
 
 class EmployeeDashboardView extends GetView<EmployeeDashboardController> {
   const EmployeeDashboardView({super.key});
@@ -69,11 +70,17 @@ class EmployeeDashboardView extends GetView<EmployeeDashboardController> {
       children: [
         Row(
           children: [
+            AppUserAvatar(
+              imageUrl: controller.userAvatarUrl.value,
+              name: name,
+              radius: 20,
+            ),
+            const SizedBox(width: AppSpacing.sm + 4),
             Text(
               'Welcome, $name',
               style: AppTypography.headlineLg(
                 color: isDark ? AppColors.darkOnSurface : AppColors.primary,
-              ).copyWith(fontWeight: FontWeight.w800, fontSize: 28),
+              ).copyWith(fontWeight: FontWeight.w800, fontSize: 26),
             ),
             const SizedBox(width: AppSpacing.sm),
             Container(

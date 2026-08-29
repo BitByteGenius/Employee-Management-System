@@ -8,6 +8,7 @@ import 'package:tms/modules/department/models/department_employee_model.dart';
 import 'package:tms/modules/department/models/department_models.dart';
 import 'package:tms/modules/department/views/widget/CreateDepartmentDialog.dart';
 import 'package:tms/shared/widgets/app_top_bar.dart';
+import 'package:tms/shared/widgets/app_user_avatar.dart';
 import 'package:tms/core/routes/app_pages.dart';
 import 'package:tms/modules/super_admin/dashboard/controllers/super_admin_shell_controller.dart';
 
@@ -291,7 +292,7 @@ class _ContentLayout extends StatelessWidget {
                                       Container(
                                         padding: const EdgeInsets.all(AppSpacing.xs),
                                         decoration: const BoxDecoration(
-                                          color: AppColors.primaryContainer,
+                                      color: AppColors.primaryContainer,
                                           borderRadius: AppRadius.borderSm,
                                         ),
                                         child: const Icon(Icons.code, size: AppSizes.iconSm, color: AppColors.onPrimaryContainer),
@@ -318,18 +319,10 @@ class _ContentLayout extends StatelessWidget {
                                   child: dept.admin != null
                                       ? Row(
                                           children: [
-                                            CircleAvatar(
+                                            AppUserAvatar(
+                                              imageUrl: dept.admin?.profilePicture,
+                                              name: dept.admin!.name,
                                               radius: 12,
-                                              backgroundColor: AppColors.primaryContainer,
-                                              backgroundImage: dept.admin?.profilePicture != null && dept.admin!.profilePicture!.isNotEmpty
-                                                  ? NetworkImage(dept.admin!.profilePicture!)
-                                                  : null,
-                                              child: (dept.admin?.profilePicture == null || dept.admin!.profilePicture!.isEmpty)
-                                                  ? Text(
-                                                      dept.admin!.name.isNotEmpty ? dept.admin!.name[0].toUpperCase() : 'A',
-                                                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.onPrimaryContainer),
-                                                    )
-                                                  : null,
                                             ),
                                             const SizedBox(width: AppSpacing.xs),
                                             Expanded(
@@ -598,17 +591,10 @@ class _ContentLayout extends StatelessWidget {
                               children: controller.employees.map((emp) {
                                 return ListTile(
                                   contentPadding: EdgeInsets.zero,
-                                  leading: CircleAvatar(
-                                    backgroundColor: AppColors.primaryContainer,
-                                    backgroundImage: emp.profilePicture != null && emp.profilePicture!.isNotEmpty
-                                        ? NetworkImage(emp.profilePicture!)
-                                        : null,
-                                    child: (emp.profilePicture == null || emp.profilePicture!.isEmpty)
-                                        ? Text(
-                                            emp.name.isNotEmpty ? emp.name[0].toUpperCase() : 'E',
-                                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.onPrimaryContainer),
-                                          )
-                                        : null,
+                                  leading: AppUserAvatar(
+                                    imageUrl: emp.profilePicture,
+                                    name: emp.name,
+                                    radius: 18,
                                   ),
                                   title: Text(emp.name, style: AppTypography.titleLg(color: AppColors.onSurface)),
                                   subtitle: Text(
@@ -693,18 +679,10 @@ class _ContentLayout extends StatelessWidget {
                           final cand = controller.adminCandidates[index];
                           final isChosen = chosenAdmin?.id == cand.id;
                           return ListTile(
-                            leading: CircleAvatar(
+                            leading: AppUserAvatar(
+                              imageUrl: cand.profilePicture,
+                              name: cand.name,
                               radius: 14,
-                              backgroundColor: AppColors.primaryContainer,
-                              backgroundImage: cand.profilePicture != null && cand.profilePicture!.isNotEmpty
-                                  ? NetworkImage(cand.profilePicture!)
-                                  : null,
-                              child: (cand.profilePicture == null || cand.profilePicture!.isEmpty)
-                                  ? Text(
-                                      cand.name.isNotEmpty ? cand.name[0].toUpperCase() : 'U',
-                                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.onPrimaryContainer),
-                                    )
-                                  : null,
                             ),
                             title: Text(cand.name, style: AppTypography.titleLg(color: AppColors.onSurface)),
                             subtitle: Text(cand.email, style: AppTypography.labelSm(color: AppColors.outline)),
