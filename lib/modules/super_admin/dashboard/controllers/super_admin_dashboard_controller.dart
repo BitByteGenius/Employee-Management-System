@@ -25,6 +25,7 @@ class SuperAdminDashboardController extends GetxController {
   final departmentPerformance = <Map<String, dynamic>>[].obs;
 
   final userName = 'Super Admin'.obs;
+  final userAvatarUrl = ''.obs;
 
   ApiClient get _api => Get.find<ApiClient>();
   StorageService get _storage => Get.find<StorageService>();
@@ -41,6 +42,7 @@ class SuperAdminDashboardController extends GetxController {
     if (user != null) {
       final name = user['fullName'] ?? user['name'] ?? user['email'] ?? 'Super Admin';
       userName.value = name.toString();
+      userAvatarUrl.value = (user['profilePicture'] ?? user['avatar'] ?? '').toString();
     }
   }
 

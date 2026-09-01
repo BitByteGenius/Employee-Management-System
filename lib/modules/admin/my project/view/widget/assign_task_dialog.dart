@@ -7,6 +7,7 @@ import 'package:tms/core/constants/app_sizes.dart';
 import 'package:tms/core/constants/app_typography.dart';
 import 'package:tms/modules/admin/my%20project/controller/admin_project_controller.dart';
 import 'package:tms/modules/admin/my%20project/models/admin_project_model.dart';
+import 'package:tms/shared/widgets/app_user_avatar.dart';
 
 class AssignTaskDialog extends StatefulWidget {
   final AdminProjectModel project;
@@ -242,16 +243,10 @@ class _AssignTaskDialogState extends State<AssignTaskDialog> {
                               value: empId,
                               child: Row(
                                 children: [
-                                  CircleAvatar(
+                                  AppUserAvatar(
+                                    imageUrl: (emp['profilePicture'] ?? emp['avatar'])?.toString(),
+                                    name: name,
                                     radius: 12,
-                                    backgroundColor: AppColors.primaryContainer,
-                                    child: Text(
-                                      name.isNotEmpty ? name[0].toUpperCase() : 'E',
-                                      style: AppTypography.labelSm(color: AppColors.onPrimaryContainer).copyWith(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
                                   ),
                                   const SizedBox(width: 8),
                                   Expanded(

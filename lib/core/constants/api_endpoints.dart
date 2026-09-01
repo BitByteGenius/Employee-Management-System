@@ -5,18 +5,31 @@ import 'package:flutter/foundation.dart';
 class ApiEndpoints {
   ApiEndpoints._();
 
+  // static String get baseUrl {
+  //   if (kIsWeb) return 'http://localhost:5000/api/v1';
+  //   if (Platform.isAndroid) return 'http://10.0.2.2:5000/api/v1';
+  //   return 'http://localhost:5000/api/v1';
+  // }
+
+  static const String productionBaseUrl =
+      'https://employee-management-system-backend-sb7l.onrender.com/api/v1';
+
   static String get baseUrl {
-    if (kIsWeb) return 'http://localhost:5000/api/v1';
-    if (Platform.isAndroid) return 'http://10.0.2.2:5000/api/v1';
-    return 'http://localhost:5000/api/v1';
+    // Flutter Web deployed on Vercel
+    if (kIsWeb) return productionBaseUrl;
+
+    // Android/iOS/Desktop production API
+    return productionBaseUrl;
   }
 
-  // Auth
+  // Auth & Profile
   static const String register = '/auth/register';
   static const String login = '/auth/login';
   static const String refreshToken = '/auth/refresh-token';
   static const String logout = '/auth/logout';
   static const String me = '/auth/me';
+  static const String profile = '/users/profile';
+  static const String profilePicture = '/users/profile/picture';
 
   // ==========================================================================
   // DEPARTMENTS
@@ -67,7 +80,11 @@ class ApiEndpoints {
 
   // Notifications
   static const String notifications = '/notifications';
+  static const String unreadNotificationsCount = '/notifications/unread-count';
+  static const String recentActivity = '/notifications/recent-activity';
   static String markNotificationRead(String id) => '/notifications/$id/read';
   static const String markAllNotificationsRead = '/notifications/read-all';
+  static String dismissNotification(String id) => '/notifications/$id/dismiss';
 }
+
 

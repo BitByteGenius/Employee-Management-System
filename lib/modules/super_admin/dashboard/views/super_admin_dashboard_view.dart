@@ -10,6 +10,10 @@ import 'package:tms/shared/widgets/app_stat_card.dart';
 import 'package:tms/shared/widgets/app_state_widgets.dart';
 import 'package:tms/shared/widgets/app_status_badge.dart';
 import 'package:tms/shared/widgets/app_top_bar.dart';
+import 'package:tms/shared/widgets/app_user_avatar.dart';
+
+import 'package:tms/core/routes/app_pages.dart';
+import 'package:tms/modules/super_admin/dashboard/controllers/super_admin_shell_controller.dart';
 
 class SuperAdminDashboardView
     extends GetView<SuperAdminDashboardController> {
@@ -36,6 +40,14 @@ class SuperAdminDashboardView
             subtitle: 'Super Admin Overview',
             userName: controller.userName.value,
             userRole: 'Super Admin',
+            userAvatarUrl: controller.userAvatarUrl.value,
+            onNotificationPressed: () {
+              if (Get.isRegistered<SuperAdminShellController>()) {
+                Get.find<SuperAdminShellController>().setRoute(AppRoutes.notifications);
+              } else {
+                Get.toNamed(AppRoutes.notifications);
+              }
+            },
 
             // Only provided on mobile.
             onMenuPressed: onMenuPressed,
@@ -760,22 +772,10 @@ class SuperAdminDashboardView
                   ),
                   child: Row(
                     children: [
-                      CircleAvatar(
+                      AppUserAvatar(
+                        imageUrl: (user['profilePicture'] ?? user['avatar'])?.toString(),
+                        name: (user['fullName'] ?? user['name'] ?? 'User').toString(),
                         radius: 18,
-                        backgroundColor:
-                            AppColors
-                                .primaryContainer,
-                        child: Text(
-                          user[
-                                  'initials'] ??
-                              'U',
-                          style:
-                              AppTypography
-                                  .labelMd(
-                            color: AppColors
-                                .onPrimaryContainer,
-                          ),
-                        ),
                       ),
 
                       const SizedBox(

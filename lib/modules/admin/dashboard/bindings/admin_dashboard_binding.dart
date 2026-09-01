@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:tms/modules/admin/my%20project/controller/admin_project_controller.dart';
 import '../controllers/admin_dashboard_controller.dart';
 import '../controllers/admin_shell_controller.dart';
 
@@ -18,6 +19,12 @@ class AdminDashboardBinding extends Bindings {
         fenix: true,
       );
     }
+
+    if (!Get.isRegistered<AdminProjectController>()) {
+      Get.lazyPut<AdminProjectController>(
+        () => AdminProjectController(),
+        fenix: true,
+      );
+    }
   }
 }
-

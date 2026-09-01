@@ -4,6 +4,8 @@ import 'package:tms/core/constants/app_colors.dart';
 import 'package:tms/core/constants/app_sizes.dart';
 import 'package:tms/core/constants/app_typography.dart';
 import 'package:tms/core/theme/theme_controller.dart';
+import 'package:tms/modules/profile/views/profile_dialog.dart';
+import 'package:tms/shared/widgets/app_user_avatar.dart';
 
 class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -17,6 +19,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onMenuPressed;
   final ValueChanged<String>? onSearchChanged;
   final VoidCallback? onNotificationPressed;
+  final VoidCallback? onProfilePressed;
   final int unreadNotificationsCount;
 
   const AppTopBar({
@@ -32,6 +35,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
     this.onMenuPressed,
     this.onSearchChanged,
     this.onNotificationPressed,
+    this.onProfilePressed,
     this.unreadNotificationsCount = 2,
   });
 
@@ -253,55 +257,54 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
 
           const SizedBox(width: AppSpacing.xs),
 
-          // Profile Avatar & Role Info
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CircleAvatar(
-                radius: 16,
-                backgroundColor: AppColors.primaryContainer,
-                backgroundImage: (userAvatarUrl != null && userAvatarUrl!.isNotEmpty)
-                    ? NetworkImage(userAvatarUrl!)
-                    : null,
-                child: (userAvatarUrl == null || userAvatarUrl!.isEmpty)
-                    ? Text(
-                        userName.isNotEmpty ? userName[0].toUpperCase() : 'U',
-                        style: AppTypography.labelMd(color: AppColors.onPrimaryContainer),
-                      )
-                    : null,
-              ),
-              if (!isMobile && screenWidth > 600) ...[
-                const SizedBox(width: AppSpacing.xs),
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 120),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        userName,
-                        style: AppTypography.bodyMd(
-                          color: isDark
-                              ? AppColors.darkOnSurface
-                              : AppColors.onSurface,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        userRole,
-                        style: AppTypography.labelSm(
-                          color: AppColors.secondary,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
+          // Profile Avatar & Role Info (Clickable to open Profile Dialog)
+          InkWell(
+            onTap: onProfilePressed ?? () => ProfileDialog.show(context),
+            borderRadius: BorderRadius.circular(8),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  AppUserAvatar(
+                    imageUrl: userAvatarUrl,
+                    name: userName,
+                    radius: 16,
                   ),
-                ),
-              ],
-            ],
+                  if (!isMobile && screenWidth > 600) ...[
+                    const SizedBox(width: AppSpacing.xs),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 120),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            userName,
+                            style: AppTypography.bodyMd(
+                              color: isDark
+                                  ? AppColors.darkOnSurface
+                                  : AppColors.onSurface,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            userRole,
+                            style: AppTypography.labelSm(
+                              color: AppColors.secondary,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
           ),
         ],
       ),

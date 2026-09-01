@@ -24,7 +24,9 @@ abstract class AppRoutes {
 
   //employee Screen
   static const String employeeDashboard = '/employee/dashboard';
-  static const String employeeProjects = '/employee/Task';
+  static const String employeeTasks = '/employee/tasks';
+  static const String employeeProjects = '/employee/projects';
+  static const String employeeTimeTracking = '/employee/time-tracking';
 
   // Core Features
   static const String tasks = '/tasks';

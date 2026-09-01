@@ -115,6 +115,7 @@ class _AdminShellViewState extends State<AdminShellView> {
                     onTabSelected: controller.changeTab,
                     onMenuPressed: !isDesktop ? _openMobileDrawer : null,
                     onSearchChanged: controller.onSearchChanged,
+                    onNotificationPressed: () => _handleRouteSelected(AppRoutes.notifications),
                     unreadNotificationsCount: controller.unreadNotificationsCount.value,
                   ),
                 ),

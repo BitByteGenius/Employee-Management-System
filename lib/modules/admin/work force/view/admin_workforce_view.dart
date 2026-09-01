@@ -9,6 +9,7 @@ import 'package:tms/shared/widgets/app_data_table.dart';
 import 'package:tms/shared/widgets/app_stat_card.dart';
 import 'package:tms/shared/widgets/app_state_widgets.dart';
 import 'package:tms/shared/widgets/app_status_badge.dart';
+import 'package:tms/shared/widgets/app_user_avatar.dart';
 
 class AdminWorkforceView extends StatefulWidget {
   const AdminWorkforceView({super.key});
@@ -217,10 +218,10 @@ class _AdminWorkforceViewState extends State<AdminWorkforceView> {
                     Text(code, style: AppTypography.labelMd(color: AppColors.secondary, fontWeight: FontWeight.w600)),
                     Row(
                       children: [
-                        CircleAvatar(
+                        AppUserAvatar(
+                          imageUrl: (emp['profilePicture'] ?? emp['avatar'])?.toString(),
+                          name: name,
                           radius: 13,
-                          backgroundColor: AppColors.primaryContainer,
-                          child: Text(name.isNotEmpty ? name[0].toUpperCase() : 'U', style: AppTypography.labelSm(color: AppColors.onPrimaryContainer)),
                         ),
                         const SizedBox(width: 8),
                         Flexible(

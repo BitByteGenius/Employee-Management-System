@@ -4,6 +4,7 @@ import 'package:tms/core/constants/app_colors.dart';
 import 'package:tms/core/constants/app_sizes.dart';
 import 'package:tms/core/constants/app_typography.dart';
 import 'package:tms/core/routes/app_pages.dart';
+import 'package:tms/modules/profile/views/profile_dialog.dart';
 
 class SuperAdminSidebar extends StatelessWidget {
   const SuperAdminSidebar({
@@ -140,52 +141,56 @@ class SuperAdminSidebar extends StatelessWidget {
     BuildContext context,
     bool isDark,
   ) {
-    return Padding(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Row(
-        children: [
-          Container(
-            width: 42,
-            height: 42,
-            decoration: const BoxDecoration(
-              color: AppColors.primary,
-              borderRadius: AppRadius.borderMd,
+    return InkWell(
+      onTap: () => ProfileDialog.show(context),
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Row(
+          children: [
+            Container(
+              width: 42,
+              height: 42,
+              decoration: const BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: AppRadius.borderMd,
+              ),
+              child: const Icon(
+                Icons.admin_panel_settings,
+                color: Colors.white,
+                size: 24,
+              ),
             ),
-            child: const Icon(
-              Icons.admin_panel_settings,
-              color: Colors.white,
-              size: 24,
-            ),
-          ),
 
-          const SizedBox(width: AppSpacing.sm),
+            const SizedBox(width: AppSpacing.sm),
 
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-  'TMS',
-  style: AppTypography.titleLg(
-    color: isDark
-        ? AppColors.darkOnSurface
-        : AppColors.primary,
-  ).copyWith(
-    fontWeight: FontWeight.w800,
-  ),
-),
-                Text(
-                  'Super Admin',
-                  style: AppTypography.labelSm(
-                    color: isDark
-                        ? AppColors.darkOnSurfaceVariant
-                        : AppColors.onSurfaceVariant,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'TMS',
+                    style: AppTypography.titleLg(
+                      color: isDark
+                          ? AppColors.darkOnSurface
+                          : AppColors.primary,
+                    ).copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
-                ),
-              ],
+                  Text(
+                    'Super Admin (Edit Profile)',
+                    style: AppTypography.labelSm(
+                      color: isDark
+                          ? AppColors.darkOnSurfaceVariant
+                          : AppColors.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
